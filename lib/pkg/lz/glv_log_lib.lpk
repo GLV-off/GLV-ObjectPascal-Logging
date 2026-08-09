@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="glv_log_lib"/>
+    <AutoUpdate Value="OnRebuildingAll"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\src"/>
+        <Libraries Value="..\..\out\$(TargetCPU)-$(TargetOS)"/>
+        <OtherUnitFiles Value="..\..\src"/>
+        <UnitOutputDirectory Value="..\..\out\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <CodeGeneration>
+        <Optimizations>
+          <OptimizationLevel Value="0"/>
+        </Optimizations>
+      </CodeGeneration>
+    </CompilerOptions>
+    <Files>
+      <Item>
+        <Filename Value="..\..\src\GlvLog.pas"/>
+        <UnitName Value="GlvLog"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogBase.pas"/>
+        <UnitName Value="GlvLogBase"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogCustom.pas"/>
+        <AddToUsesPkgSection Value="False"/>
+        <UnitName Value="GlvLogCustom"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogDev.pas"/>
+        <AddToUsesPkgSection Value="False"/>
+        <UnitName Value="GlvLogDev"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogFileOps.pas"/>
+        <UnitName Value="GlvLogFileOps"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogFiles.pas"/>
+        <UnitName Value="GlvLogFiles"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogGroup.pas"/>
+        <UnitName Value="GlvLogGroup"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogTypes.pas"/>
+        <UnitName Value="GlvLogTypes"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>
