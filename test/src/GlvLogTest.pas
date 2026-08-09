@@ -47,7 +47,7 @@ procedure TCustomLogTest.TestHookUp;
 var
   L: TLog;
 begin
-  L := TCustomLog.Create(@TCustomLogTest.FakeLog);
+  L := TCustomLog.Create(Self.FakeLog);
   try
     L.Log(TLogLvl.llDebug, 'test');
     Assert.AreEqual(Ord(FLastLvl), Ord(TLogLvl.llDebug), 'lvl not match');

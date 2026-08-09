@@ -36,7 +36,7 @@ type
 
   TConsole = class
   public
-    class procedure ConsoleLog(const ALvl: TLogLvl; const ATxt: string); static;
+    class procedure ConsoleLog(const ALvl: TLogLvl; const ATxt: string);
   end;
 
 implementation
@@ -60,7 +60,7 @@ end;
 class constructor TLogging.Create;
 begin
   FInst := TGroupLog.Create([
-    TCustomLog.Create(@TConsole.ConsoleLog),
+    TCustomLog.Create(TConsole.ConsoleLog),
     TAsyncFileLog.Create(TAsyncLogThread.Create('log.log'))
   ]);
 end;
