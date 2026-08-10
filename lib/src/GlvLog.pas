@@ -1,3 +1,14 @@
+{
+ Module:       GlvLog
+ Author:       GLV_off
+ Description:  Library facade unit. Includes and redeclares
+ -             all common classes,types and routines
+ -             for general usage.
+ -             And for common user experience, contains single
+ -             class singleton - Tlogging. Contains active at
+ -             application logging configuration of object's.
+ History:      2026-08-10: Created
+}
 unit GlvLog;
 
 {$I 'glv_log_lib.inc'}
@@ -21,6 +32,12 @@ type
   TPrimitiveFileLog = GlvLogFiles.TPrimitiveFileLog;
   TAsyncFileLog = GlvLogFiles.TAsyncFileLog;
 
+  {
+   Logging singleton.
+
+   By default contains one file logging object and
+   custom logging object with console writing implementation
+  }
   TLogging = class
   strict private class var
     FInst: TLog;
@@ -34,6 +51,9 @@ type
     class property Inst: TLog read GetLog write SetLog;
   end;
 
+  {
+   Technical object for console logging implementation.
+  }
   TConsole = class
   public
     class procedure ConsoleLog(const ALvl: TLogLvl; const ATxt: UnicodeString);

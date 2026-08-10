@@ -1,3 +1,10 @@
+{
+ Module:       GlvLogFileOps
+ Author:       GLV_off
+ Description:  Private IO utils for reading\writing data.
+ -             Not intended for public usage.
+ History:      2026-08-10: Created
+}
 unit GlvLogFileOps;
 
 {$I 'glv_log_lib.inc'}
@@ -8,13 +15,30 @@ uses
   Classes,
   SysUtils;
 
+{
+ @deprecated
+ Before proper autotesting project was created this routine
+ called to test operation's correctnes in this unit.
+ Testing code should be rewriten into proper Unit\Integration  test's
+}
 procedure TestFileOps;
 
 type
   TLines = TArray<UnicodeString>;
 
+{
+ Creating file stream for writing operations.
+ If File exists - it create stream as reading
+ If File not exists - it creates stream as file will be
+ created before or after writing.
+}
 function CreateStream(const AFilepath: string): TFileStream;
 
+{
+ Write lines( array of strings) into file at `AFilepath`
+ THis routine save text in UTF-8 encoding with BOM.
+ @param AFIlepath Filepath to save lines.
+}
 function WriteLines(const AFilepath: string; const ALines: TLines): Boolean;
 
 implementation
@@ -43,6 +67,11 @@ begin
 end;
 
 function IsBom(const ABytes: TBytes): Boolean;
+{ Check byte sequence as it is a BOM header or not.
+  Conditions to pass
+  - Length >= 3 bytes
+  - BOM header search starts from first bytes
+  - ALl 3 bytes should match apropriated values. }
 begin
   Result := (Length(ABytes) >= 3)
     and (ABytes[0] = $ef)
@@ -51,11 +80,15 @@ begin
 end;
 
 function CreateBom: TBytes;
+{ Create constant packaet of BOM header.}
 begin
   Result := [$EF, $BB, $BF];
 end;
 
 function WriteBom(const AStream: TStream): Boolean;
+{ Writing BOM bytes header in stream. It will not sugest thath
+  stream already contain's writen bom, so use carefully. Not
+  intended for public usage. }
 var
   BOM: TBytes;
   BUF: array[0..2] of byte = (0, 0, 0);
