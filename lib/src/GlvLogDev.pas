@@ -24,12 +24,12 @@ procedure DevLogWarnFmt(const AFmt: string; const AItems: array of const);
 
 implementation
 
-procedure DevLog(const Alvl: TLogLvl; const ATxt: string);
+procedure DevLog(const ALvl: TLogLvl; const ATxt: string);
 begin
   WriteLn('[', ALvl.AsStr, '] ', ATxt);
 end;
 
-procedure DevLogFmt(const Alvl: TLogLvl; const AFmt: string; const AItems: array of const);
+procedure DevLogFmt(const ALvl: TLogLvl; const AFmt: string; const AItems: array of const);
 begin
   DevLog(ALvl, Format(AFmt, AItems));
 end;

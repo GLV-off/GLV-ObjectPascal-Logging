@@ -37,7 +37,7 @@ end;
 procedure TCustomLog.Log(const ALvl: TLogLvl; const ATxt: string);
 begin
   if Assigned(FCb) then
-    FCb(ALvl, ATxt);
+    FCb(ALvl, UTF8Decode(ATxt));
 end;
 
 end.

@@ -16,16 +16,30 @@ type
 function CreateStream(const AFilepath: string): TFileStream;
 
 function WriteLines(const AFilepath: string; const ALines: TLines): Boolean;
-function WriteBom(const AStream: TStream): Boolean;
 
 implementation
 
+{
+ Writing BOM bytes header in stream. It will not sugest thath
+ stream already contain's writen bom, so use carefully. Not
+ intended for public usage.
+}
+function WriteBom(const AStream: TStream): Boolean; forward;
+
 function CreateStream(const AFilepath: string): TFileStream;
+{ Creating file stream for writing operations.
+  If File exists - it create stream as reading
+  If File not exists - it creates stream as file will be
+  created before or after writing. }
+var
+  Mask: Word;
 begin
   if FileExists(AFilepath) then
-    Result := TFileStream.Create(AFilepath, fmOpenReadWrite or fmShareDenyNone)
+    Mask := fmOpenReadWrite or fmShareDenyNone
   else
-    Result := TFileStream.Create(AFilepath, fmCreate);
+    Mask := fmCreate;
+
+  Result := TFileStream.Create(AFilepath, Mask)
 end;
 
 function IsBom(const ABytes: TBytes): Boolean;
@@ -44,29 +58,37 @@ end;
 function WriteBom(const AStream: TStream): Boolean;
 var
   BOM: TBytes;
-  BUF: array[0..2] of byte = (0,0,0);
+  BUF: array[0..2] of byte = (0, 0, 0);
   Readed: LongInt;
 begin
-  if AStream.Size = 0 then
-  begin
-    Bom := CreateBom();
-    AStream.WriteBuffer(BOM[0], Length(Bom));
-    Result := True;
-  end
-  else
-  begin
-    AStream.Position := 0;
-    SetLength(Bom, 3);
-    FillChar(Bom[0], Length(Bom), 0);
-    Readed := AStream.Read(Buf[0], 3);
-    Result := IsBom(Bom);
+  try
+    if AStream.Size = 0 then
+    begin
+      Bom := CreateBom();
+      AStream.WriteBuffer(BOM[0], Length(Bom));
+      Result := True;
+    end
+    else
+    begin
+      AStream.Position := 0;
+      SetLength(Bom, 3);
+      FillChar(Bom[0], Length(Bom), 0);
+      Readed := AStream.Read(Buf[0], 3);
+      Result := IsBom(Bom) and (Readed > 0);
+    end;
+  finally
+    SetLength(Bom, 0);
   end;
-  SetLength(Bom, 0);
 end;
 
 function WriteLines(const AFilepath: string; const ALines: TLines): Boolean;
+{ Write lines( array of strings) into file at `AFilepath`
+  THis routine save text in UTF-8 encoding with BOM.
+  @param AFIlepath Filepath to save lines. }
+type
+  TBuf = array[0..4095] of Byte;
 var
-  Buf: array[0..4095] of Byte;
+  Buf: TBuf;
   Stream: TFileStream;
   Line: string;
   I: Integer;
@@ -77,6 +99,7 @@ begin
   if not Assigned(Stream) then
     Exit(False);
 
+  Buf := Default(TBuf);
   FillChar(Buf[0], Sizeof(Buf), 0);
   try
     try
