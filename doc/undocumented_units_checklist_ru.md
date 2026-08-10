@@ -8,6 +8,6 @@
 | GlvLogDev     | Не задокументирован  |
 | GlvLogFileOps | Не задокументирован  |
 | GlvLogFiles   | Не задокументирован  |
-| GlvLogGroup   | Не задокументирован  |
+| GlvLogGroup   | Добавлены коментарии |
 | GlvLogTypes   | Добавлены коментарии |
 
