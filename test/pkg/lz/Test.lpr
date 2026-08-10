@@ -4,6 +4,8 @@ program Test;
 
 uses
   Glv.Testing.App,
+  TestEnv,
+  TestFileUtils,
   LogTestUnit;
 
 begin
