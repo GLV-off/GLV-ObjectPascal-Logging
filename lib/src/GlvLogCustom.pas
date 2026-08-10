@@ -9,7 +9,7 @@ uses
   GlvLogBase;
 
 type
-  TLogCb = procedure(const ALvl: TLogLvl; const ATxt: string) of object;
+  TLogCb = procedure(const ALvl: TLogLvl; const ATxt: UnicodeString) of object;
 
   TCustomLog = class(TLog)
   strict protected

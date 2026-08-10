@@ -4,10 +4,10 @@ program Test;
 
 uses
   Glv.Testing.App,
-  GlvLogTest;
+  LogTestUnit;
 
 begin
-  Run('GLV Log autotests');
+  Run('GLV Log unit autotests');
 {$IFDEF DEBUG}
   ReadLn;
 {$ENDIF DEBUG}

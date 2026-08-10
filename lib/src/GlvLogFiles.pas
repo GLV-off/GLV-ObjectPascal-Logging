@@ -39,17 +39,23 @@ type
   strict private
     FThread: TAsyncLogThread;
   public
-    constructor Create(const AThread: TAsyncLogThread);
+    constructor Create(const AFilepath: UnicodeString); overload;
+    constructor Create(const AThread: TAsyncLogThread); overload;
     destructor Destroy; override;
     procedure Log(const ALvl: TLogLvl; const ATxt: string); override;
   end;
 
+  TDateTimeFunc = function: TDatetime;
+
   TPrimitiveFileLog = class(TLog)
   strict private
-    FFilename: string;
+    FFilename: UnicodeString;
     FSync: TSynchroObject;
+    FDateTimeFunc: TDateTimeFunc;
+    function GetDatetime: TDatetime;
   public
-    constructor Create(const AFilename: string);
+    constructor Create(const AFilename: UnicodeString; const ADateTimeFunc: TDateTimeFunc); overload;
+    constructor Create(const AFilename: UnicodeString); overload;
     destructor Destroy; override;
     procedure Log(const ALvl: TLogLvl; const ATxt: string); override;
   end;
@@ -63,6 +69,8 @@ procedure TAsyncLogThread.Execute;
 var
   R: TLogRec;
   C: LongInt;
+  Lines: TArray<UnicodeString>;
+  I: LongInt;
 begin
   while not Terminated do
   begin
@@ -75,18 +83,12 @@ begin
         while C > 0 do
         begin
           if Terminated then
-            break;
-          //DevLogDebugFmt('[before deq] queue.count = %d', [FQueue.Count]);
+            Break;
           R := FQueue.Dequeue();
-          //DevLogDebugFmt('[after  deq]queue.count = %d', [FQueue.Count]);
-          FBuffer.Insert(0, Format('[%s]: %s',[R.Lvl.AsStr, R.Txt]));
-          //DevLogDebugFmt('[after insert] queue.count = %d', [FQueue.Count]);
+          //FBuffer.Insert(0, Format('[%s]: %s',[R.Lvl.AsStr, R.Txt]));
+          FBuffer.Add(Format('[%s]: %s',[R.Lvl.AsStr, R.Txt]));
           Dec(C);
         end;
-      end
-      else
-      begin
-        //Suspended := True;
       end;
     finally
       FSync.Release();
@@ -96,7 +98,14 @@ begin
     try
       if FBuffer.Count >= 0 then
       begin
-        WriteLines(FFilepath, FBUffer.ToStringArray());
+        Lines := [];
+        SetLength(Lines, FBuffer.Count);
+        for I := 0 to FBuffer.Count - 1 do
+        begin
+          Lines[I] := UTF8Decode(FBuffer[I]);
+        end;
+        WriteLines(FFilepath, Lines);
+        SetLength(Lines, 0);
         FBuffer.Clear();
       end;
     finally
@@ -122,9 +131,20 @@ begin
 end;
 
 destructor TAsyncLogThread.Destroy;
+var
+  Lines: TLines;
+  I: LongInt;
 begin
   if FBuffer.Count > 0 then
-    WriteLines(FFilepath, FBUffer.ToStringArray());
+  begin
+    Lines := [];
+    SetLength(Lines, FBuffer.Count);
+    for I := 0 to FBuffer.Count - 1 do
+    begin
+      Lines[I] := UTF8Decode(FBuffer[I]);
+    end;
+    WriteLines(FFilepath, Lines);
+  end;
   FreeAndNil(FQueue);
   FreeAndNil(FBuffer);
   FreeAndNil(FSync);
@@ -148,6 +168,11 @@ begin
   end;
 end;
 
+constructor TAsyncFileLog.Create(const AFilepath: UnicodeString);
+begin
+  Self.Create(TAsyncLogThread.Create(AFilepath));
+end;
+
 constructor TAsyncFileLog.Create(const AThread: TAsyncLogThread);
 begin
   inherited Create;
@@ -169,11 +194,25 @@ begin
   FThread.Log(ALvl, ATxt);
 end;
 
-constructor TPrimitiveFileLog.Create(const AFilename: string);
+function TPrimitiveFileLog.GetDatetime: TDatetime;
+begin
+  if ASsigned(FDateTimeFunc) then
+    Result := FDateTimeFunc
+  else
+    Result := Now;
+end;
+
+constructor TPrimitiveFileLog.Create(const AFilename: UnicodeString; const ADateTimeFunc: TDateTimeFunc);
 begin
   inherited Create;
   FFilename := AFilename;
   FSync := TCriticalSection.Create;
+  FDateTimeFunc:= ADateTimeFunc;
+end;
+
+constructor TPrimitiveFileLog.Create(const AFilename: UnicodeString);
+begin
+  Self.Create(AFilename, @Now);
 end;
 
 destructor TPrimitiveFileLog.Destroy;
@@ -193,11 +232,11 @@ begin
   FSync.Acquire;
   Items := TStringList.Create();
   try
-    if FileExists(FFilename) then
-      Items.LoadFromFile(FFilename);
+    if FileExists(UTF8Encode(FFilename)) then
+      Items.LoadFromFile(UTF8Encode(FFilename));
 
-    Items.Add(FormatDateTime('yyyy-mm-dd hh:nn:ss', Now) + ' [' + LevelStr + '] ' + ATxt);
-    Items.SaveToFile(FFilename);
+    Items.Add(FormatDateTime('yyyy-mm-dd hh:nn:ss', GetDatetime) + ' [' + LevelStr + '] ' + ATxt);
+    Items.SaveToFile(UTF8Encode(FFilename));
   finally
     FreeAndNil(Items);
     FSync.Release;

@@ -13,6 +13,7 @@ uses
 
 type
   TLogLvl = GlvLogTypes.TLogLvl;
+  //TLogLvlHelper = GlvLogTypes.TLogLvlHelper;
   TLogCb = GlvLogCustom.TLogCb;
 
   TLog = GlvLogBase.TLog;
@@ -36,8 +37,11 @@ type
 
   TConsole = class
   public
-    class procedure ConsoleLog(const ALvl: TLogLvl; const ATxt: string);
+    class procedure ConsoleLog(const ALvl: TLogLvl; const ATxt: UnicodeString);
   end;
+
+const
+  LogLvlAsStr: function(const X: TLogLvl): UnicodeString = @GlvLogTypes.LogLvlAsStr;
 
 implementation
 
@@ -70,7 +74,7 @@ begin
   FreeAndNil(FInst);
 end;
 
-class procedure TConsole.ConsoleLog(const ALvl: TLogLvl; const ATxt: string);
+class procedure TConsole.ConsoleLog(const ALvl: TLogLvl; const ATxt: UnicodeString);
 begin
   WriteLn(ALvl.AsStr, ': t.id=', TThread.CurrentThread.ThreadID, ', m=', ATxt);
 end;

@@ -9,20 +9,27 @@ type
 
   TLogLvlHelper = record helper for TLogLvl
   public
-    function AsStr: string;
+    function AsStr: UnicodeString;
   end;
+
+function LogLvlAsStr(const ALvl: TLogLvl): UnicodeString;
 
 implementation
 
-function TlogLvlHelper.AsStr: string;
+function LogLvlAsStr(const ALvl: TLogLvl): UnicodeString;
 begin
-  case Self of
+  case ALvl of
     llDebug: Result := 'DEBUG';
     llInfo: Result := 'INFO';
     llWarn: Result  := 'WARN';
     llError: Result := 'ERROR';
     else Result := 'UNKNOWN';
   end;
+end;
+
+function TlogLvlHelper.AsStr: UnicodeString;
+begin
+  Result := LogLvlAsStr(Self);
 end;
 
 end.

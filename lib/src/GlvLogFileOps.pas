@@ -11,7 +11,7 @@ uses
 procedure TestFileOps;
 
 type
-  TLines = TArray<string>;
+  TLines = TArray<UnicodeString>;
 
 function CreateStream(const AFilepath: string): TFileStream;
 
@@ -83,7 +83,7 @@ begin
       if not WriteBom(Stream) then
         Stream.Position := 0;
 
-      Stream.Position := Stream.Size;
+      Stream.Position := 0;
 
       for I := 0 to Length(ALines) - 1 do
       begin
