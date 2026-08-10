@@ -1,3 +1,11 @@
+{
+ Module:       GlvLogFiles
+ Author:       GLV_off
+ Description:  Collection of file logger's. One sync and one
+ -             async implementation (with separated
+ -             single thread).
+ History:      2026-08-10: Created
+}
 unit GlvLogFiles;
 
 {$I 'glv_log_lib.inc'}
@@ -13,6 +21,11 @@ uses
   GlvLogBase;
 
 type
+  {
+   Async Logging thread used in TAsyncFileLog class
+   as implementation of delayed background filewrite
+   operation controll.
+  }
   TAsyncLogThread = class(TThread)
   public type
     TLogRec = record
@@ -35,6 +48,12 @@ type
     procedure Log(const ALvl: TLogLvl; const ATxt: string);
   end;
 
+  {
+   Async file loggger
+
+   Main control point of async logging. Delegate
+   logging procedure to its encapsulated thread.
+  }
   TAsyncFileLog = class(TLog)
   strict private
     FThread: TAsyncLogThread;
@@ -45,8 +64,24 @@ type
     procedure Log(const ALvl: TLogLvl; const ATxt: string); override;
   end;
 
+  {
+   Function that can return value of TDatetime data type.
+
+   Mainly used in sync (currently) logging as
+   routine abstraction for logic of generating datetime.
+  }
   TDateTimeFunc = function: TDatetime;
 
+  {
+   Synchronus file logging object
+
+   Writes in file as logging operation accures.
+
+   Before real logging reads all file in memory and
+   appends it's text to buffer and rewrite file.
+
+   Not thread safe at this point.
+  }
   TPrimitiveFileLog = class(TLog)
   strict private
     FFilename: UnicodeString;
