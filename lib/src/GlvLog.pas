@@ -13,7 +13,6 @@ uses
 
 type
   TLogLvl = GlvLogTypes.TLogLvl;
-  //TLogLvlHelper = GlvLogTypes.TLogLvlHelper;
   TLogCb = GlvLogCustom.TLogCb;
 
   TLog = GlvLogBase.TLog;
