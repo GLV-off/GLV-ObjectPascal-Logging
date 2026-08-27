@@ -176,6 +176,8 @@ Note: `TGroupLog` owns the objects passed to it and frees them on destruction.
 
 ## Tests
 
+Unit and integration testing uses wrapper library [](https://github.com/GLV-off/GLV_Pascal_TestingWrapper). You should clone this package before open autotesting project.
+
 Build and run `test/pkg/lz/Test.lpr` (uses the `Glv.Testing` runner):
 
 ```sh
