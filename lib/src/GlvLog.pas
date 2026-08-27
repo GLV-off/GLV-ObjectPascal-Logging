@@ -62,11 +62,36 @@ type
 const
   LogLvlAsStr: function(const X: TLogLvl): UnicodeString = @GlvLogTypes.LogLvlAsStr;
 
+procedure Info(const ATxt: string);
+procedure Warn(const ATxt: string);
+procedure Error(const ATxt: string);
+procedure Debug(const ATxt: string);
+
 implementation
 
 uses
   SysUtils,
   Classes;
+
+procedure Info(const ATxt: string);
+begin
+  TLogging.Inst.Log(TLogLvl.llInfo, ATxt);
+end;
+
+procedure Warn(const ATxt: string);
+begin
+  TLogging.Inst.Log(TLogLvl.llWarn, ATxt);
+end;
+
+procedure Error(const ATxt: string);
+begin
+  TLogging.Inst.Log(TLogLvl.llError, ATxt);
+end;
+
+procedure Debug(const ATxt: string);
+begin
+  TLogging.Inst.Log(TLogLvl.llDebug, ATxt);
+end;
 
 class function TLogging.GetLog: TLog;
 begin
