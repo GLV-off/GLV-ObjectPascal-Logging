@@ -67,6 +67,11 @@ procedure Warn(const ATxt: string);
 procedure Error(const ATxt: string);
 procedure Debug(const ATxt: string);
 
+procedure InfoFmt(const InFmt: string; const InArgs: array of const);
+procedure WarnFmt(const InFmt: string; const InArgs: array of const);
+procedure ErrorFmt(const InFmt: string; const InArgs: array of const);
+procedure DebugFmt(const InFmt: string; const InArgs: array of const);
+
 implementation
 
 uses
@@ -75,22 +80,42 @@ uses
 
 procedure Info(const ATxt: string);
 begin
-  TLogging.Inst.Log(TLogLvl.llInfo, ATxt);
+  InfoFmt('%s', [ATxt]);
 end;
 
 procedure Warn(const ATxt: string);
 begin
-  TLogging.Inst.Log(TLogLvl.llWarn, ATxt);
+  WarnFmt('%s', [ATxt]);
 end;
 
 procedure Error(const ATxt: string);
 begin
-  TLogging.Inst.Log(TLogLvl.llError, ATxt);
+  ErrorFmt('%s', [ATxt]);
 end;
 
 procedure Debug(const ATxt: string);
 begin
-  TLogging.Inst.Log(TLogLvl.llDebug, ATxt);
+  DebugFmt('%s', [ATxt]);
+end;
+
+procedure InfoFmt(const InFmt: string; const InArgs: array of const);
+begin
+  TLogging.Inst.Log(TLogLvl.llInfo, Format(InFmt, InArgs));
+end;
+
+procedure WarnFmt(const InFmt: string; const InArgs: array of const);
+begin
+  TLogging.Inst.Log(TLogLvl.llWarn, Format(InFmt, InArgs));
+end;
+
+procedure ErrorFmt(const InFmt: string; const InArgs: array of const);
+begin
+  TLogging.Inst.Log(TLogLvl.llError, Format(InFmt, InArgs));
+end;
+
+procedure DebugFmt(const InFmt: string; const InArgs: array of const);
+begin
+  TLogging.Inst.Log(TLogLvl.llDebug, Format(InFmt, InArgs));
 end;
 
 class function TLogging.GetLog: TLog;
