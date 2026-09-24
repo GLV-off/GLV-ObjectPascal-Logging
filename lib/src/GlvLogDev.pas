@@ -12,6 +12,7 @@ unit GlvLogDev;
 interface
 
 uses
+  SysUtils,
   GlvLogTypes;
 
 {

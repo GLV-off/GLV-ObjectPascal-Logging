@@ -1,0 +1,14 @@
+=============================================
+  CodeTyphon Studio
+  Typhon IDE
+  Package Information file
+=============================================
+
+glv_log_lib
+
+Version: 0.0 Date: 2026-09-24 11:18
+
+
+
+
+

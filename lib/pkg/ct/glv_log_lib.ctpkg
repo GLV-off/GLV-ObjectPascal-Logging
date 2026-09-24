@@ -3,21 +3,14 @@
   <Package Version="5">
     <PathDelim Value="\"/>
     <Name Value="glv_log_lib"/>
-    <Type Value="RunTimeOnly"/>
+    <Type Value="RunAndDesignTime"/>
     <CompilerOptions>
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <IncludeFiles Value="..\..\src"/>
-        <Libraries Value="..\..\out\$(TargetCPU)-$(TargetOS)\$(BuildMode)"/>
         <OtherUnitFiles Value="..\..\src"/>
-        <UnitOutputDirectory Value="..\..\out\$(TargetCPU)-$(TargetOS)\$(BuildMode)"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)/$(LCLWidgetType)"/>
       </SearchPaths>
-      <CodeGeneration>
-        <Optimizations>
-          <OptimizationLevel Value="0"/>
-        </Optimizations>
-      </CodeGeneration>
     </CompilerOptions>
     <Files>
       <Item>
@@ -30,12 +23,10 @@
       </Item>
       <Item>
         <Filename Value="..\..\src\GlvLogCustom.pas"/>
-        <AddToUsesPkgSection Value="False"/>
         <UnitName Value="GlvLogCustom"/>
       </Item>
       <Item>
         <Filename Value="..\..\src\GlvLogDev.pas"/>
-        <AddToUsesPkgSection Value="False"/>
         <UnitName Value="GlvLogDev"/>
       </Item>
       <Item>
@@ -57,7 +48,7 @@
     </Files>
     <RequiredPkgs>
       <Item>
-        <PackageName Value="FCL"/>
+        <PackageName Value="adFCL"/>
       </Item>
     </RequiredPkgs>
     <UsageOptions>
