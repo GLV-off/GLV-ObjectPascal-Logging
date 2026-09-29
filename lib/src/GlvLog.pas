@@ -31,6 +31,7 @@ type
   TCustomLog = GlvLogCustom.TCustomLog;
   TPrimitiveFileLog = GlvLogFiles.TPrimitiveFileLog;
   TAsyncFileLog = GlvLogFiles.TAsyncFileLog;
+  TAsyncFileLogThread = GlvLogFiles.TAsyncLogThread;
 
   {
    Logging singleton.
