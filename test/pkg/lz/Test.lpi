@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="12"/>
+    <Version Value="13"/>
     <PathDelim Value="\"/>
     <General>
       <Flags>
@@ -61,10 +61,13 @@
     </RunParams>
     <RequiredPackages>
       <Item>
-        <PackageName Value="GlvTestCross"/>
+        <PackageName Value="glv_log_def_engine"/>
       </Item>
       <Item>
-        <PackageName Value="glv_log_lib"/>
+        <PackageName Value="glv_log_contract"/>
+      </Item>
+      <Item>
+        <PackageName Value="GlvTestCross"/>
       </Item>
     </RequiredPackages>
     <Units>

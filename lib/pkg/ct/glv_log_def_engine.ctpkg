@@ -2,7 +2,7 @@
 <CONFIG>
   <Package Version="5">
     <PathDelim Value="\"/>
-    <Name Value="glv_log_lib"/>
+    <Name Value="glv_log_def_engine"/>
     <Type Value="RunAndDesignTime"/>
     <CompilerOptions>
       <Version Value="11"/>
@@ -24,6 +24,22 @@
       </Linking>
     </CompilerOptions>
     <Files>
+      <Item>
+        <Filename Value="..\..\src\GLV.Log.Builder.pas"/>
+        <UnitName Value="GLV.Log.Builder"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GLV.Log.ConsoleSink.pas"/>
+        <UnitName Value="GLV.Log.ConsoleSink"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GLV.Log.Holder.pas"/>
+        <UnitName Value="GLV.Log.Holder"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GLV.Log.Lock.pas"/>
+        <UnitName Value="GLV.Log.Lock"/>
+      </Item>
       <Item>
         <Filename Value="..\..\src\GlvLog.pas"/>
         <UnitName Value="GlvLog"/>

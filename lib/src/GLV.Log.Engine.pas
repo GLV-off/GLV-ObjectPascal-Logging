@@ -1,4 +1,10 @@
-unit GlvLogEngine;
+{
+ Module:       GLV.Log.Engine
+ Author:       GLV_off
+ Description:
+ History:      2026-10-28: Created
+}
+unit GLV.Log.Engine;
 
 {$I 'glv_log_lib.inc'}
 
@@ -6,9 +12,10 @@ interface
 
 uses
   SysUtils,
-  GlvLogTypes;
+  GLV.Log.Lvl;
 
 type
+  { }
   ELoggingEngineNotInitialized = class(Exception)
   end;
 
@@ -38,8 +45,6 @@ type
     class procedure SetCb(const InMeth: TLogEngineCallback.TMeth); overload;
     class procedure SetCb(const InProc: TLogEngineCallback.TProc); overload;
   end;
-
-
 
 implementation
 
@@ -71,7 +76,7 @@ begin
         Self.Proc(InLvl, InTxt);
     lecNil:
       begin
-        { todo: raise Exception? }
+        { todo: raise Exception or fallback to stderr ? }
         raise ELoggingEngineNotInitialized.Create('Not initialized engine!');
       end;
   end;

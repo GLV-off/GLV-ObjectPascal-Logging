@@ -12,7 +12,7 @@ unit GlvLogBase;
 interface
 
 uses
-  GlvLogTypes;
+  GLV.Log.Lvl;
 
 type
   {
@@ -25,9 +25,14 @@ type
     {
      Log text message with specifed log level.
 
+     Text is passed as UnicodeString. Encoding to bytes (UTF-8 for
+     file loggers) is up to the concrete implementation, so no
+     AnsiString <-> UnicodeString conversion happens on the call
+     boundary and non-ASCII text is not lost.
+
      @se GlvLogTypes.TLogLvl
     }
-    procedure Log(const ALvl: TLogLvl; const ATxt: string); virtual; abstract;
+    procedure Log(const InLvl: TLogLvl; const InTxt: UnicodeString); virtual; abstract;
   end;
 
 implementation

@@ -17,6 +17,7 @@ type
     procedure TearDown; override;
   published
     procedure TestPrimitiveFileLog;
+    procedure TestPrimitiveFileLogUnicode;
   end;
 
   TAsyncFileLogTest = class(TCrossTestCase)
@@ -29,6 +30,20 @@ type
     procedure TestAsyncLog;
   end;
 
+  {
+   End-to-end V2 path: TLogBuilder + TLogHolder + GLV.Log.LogInfo.
+   The file logger format must stay the TPrimitiveFileLog contract.
+  }
+  TBuilderHolderFileTest = class(TCrossTestCase)
+  strict private
+    FFilepath: TFilepath;
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure TestHolderSyncFileFormat;
+  end;
+
 function StaticDateTime: TDatetime;
 
 implementation
@@ -37,8 +52,17 @@ uses
   SysUtils,
   DateUtils,
   Classes,
+  GLV.Log,
+  GLV.Log.Builder,
+  GLV.Log.Holder,
   GlvLog,
   TestEnv;
+
+const
+  { U+4E2D and U+1F600: not representable in single-byte code pages.
+    TstReadLines decodes the file as UTF-8, so a non-UTF-8 write
+    (implicit DefaultSystemCodePage conversion) shows up as '?'. }
+  UnicodeText: UnicodeString = #$4E2D#$1F600;
 
 function StaticDateTime: TDatetime;
 begin
@@ -83,6 +107,27 @@ begin
     Assert.AreEqual('2026-08-09 12:30:00 [ERROR] error text', Line, 'line[2] written in log not match!');
     Line := Lines[3];
     Assert.AreEqual('2026-08-09 12:30:00 [WARN] warn text', Line, 'line[2] written in log not match!');
+  finally
+    SetLength(Lines, 0);
+    FreeAndNil(L);
+    TstDeleteFile(FFilepath);
+  end;
+end;
+
+procedure TFileLogTest.TestPrimitiveFileLogUnicode;
+var
+  L: TPrimitiveFileLog;
+  Lines: TLines;
+begin
+  L := TPrimitiveFileLog.Create(FFilepath, @StaticDateTime);
+  Lines := [];
+  try
+    L.Log(TLogLvl.llInfo, UnicodeText);
+
+    Lines := TstReadLines(FFilepath);
+    Assert.AreEqual(NativeInt(1), Length(Lines), 'unexpected readed lines count');
+    Assert.AreEqual('2026-08-09 12:30:00 [INFO] ' + UnicodeText, Lines[0],
+      'unicode text written to file is not UTF-8 or corrupted');
   finally
     SetLength(Lines, 0);
     FreeAndNil(L);
@@ -139,9 +184,49 @@ begin
   end;
 end;
 
+procedure TBuilderHolderFileTest.SetUp;
+begin
+  FFilepath := TEnv.TestFile;
+  TstDeleteFile(FFilepath);
+  TLogHolder.Inst := nil;
+end;
+
+procedure TBuilderHolderFileTest.TearDown;
+begin
+  { The holder owns the graph; only detach it, never free it here. }
+  TLogHolder.Inst := nil;
+  TstDeleteFile(FFilepath);
+  FFilepath := '';
+end;
+
+procedure TBuilderHolderFileTest.TestHolderSyncFileFormat;
+var
+  B: TLogBuilder;
+  Lines: TLines;
+begin
+  B := TLogBuilder.Create;
+  try
+    TLogHolder.Inst := B.SyncFile(FFilepath, @StaticDateTime).Build;
+  finally
+    FreeAndNil(B);
+  end;
+
+  GLV.Log.LogInfo('info text');
+
+  Lines := TstReadLines(FFilepath);
+  try
+    Assert.AreEqual(NativeInt(1), Length(Lines), 'unexpected readed lines count');
+    Assert.AreEqual('2026-08-09 12:30:00 [INFO] info text', Lines[0],
+      'V2 path (builder + holder) must keep the TPrimitiveFileLog format');
+  finally
+    SetLength(Lines, 0);
+  end;
+end;
+
 initialization
 
 CrossRegTest(TFileLogTest, 'Int');
 CrossRegTest(TAsyncFileLogTest, 'Int');
+CrossRegTest(TBuilderHolderFileTest, 'Int');
 
 end.

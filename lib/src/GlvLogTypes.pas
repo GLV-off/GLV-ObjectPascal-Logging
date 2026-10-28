@@ -53,7 +53,7 @@ begin
     llInfo: Result := 'INFO';
     llWarn: Result  := 'WARN';
     llError: Result := 'ERROR';
-    else Result := 'UNKNOWN';
+    //else Result := 'UNKNOWN';
   end;
 end;
 

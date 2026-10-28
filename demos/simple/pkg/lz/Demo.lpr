@@ -1,18 +1,15 @@
 program Demo;
+
 uses
-  GlvLog,
-  GlvLogContract,
-  GlvLogConsole;
+  GLV.Log,
+  GLV.Log.SyncFileEngine;
+  //GLV.Log.ConsoleEngine;
+
 begin
   LogInfo('log info');
-  LogError('log info');
-  LogWarn('log info');
-  LogDebug('log info');
-
-  Info('hello');
-  Warn('world');
-  Error('from');
-  Debug('library');
+  LogError('log error');
+  LogWarn('log warn');
+  LogDebug('log debug');
 
   ReadLn;
 end.

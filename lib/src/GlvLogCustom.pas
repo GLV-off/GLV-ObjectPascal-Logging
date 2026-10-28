@@ -14,7 +14,7 @@ unit GlvLogCustom;
 interface
 
 uses
-  GlvLogTypes,
+  GLV.Log.Lvl,
   GlvLogBase;
 
 type
@@ -45,7 +45,7 @@ type
       Main logging procedure. In this instance, redirect all
       parameters to its encapsulated callback
     }
-    procedure Log(const ALvl: TLogLvl; const ATxt: string); override;
+    procedure Log(const InLvl: TLogLvl; const InTxt: UnicodeString); override;
   end;
 
 implementation
@@ -64,12 +64,12 @@ begin
   inherited Destroy;
 end;
 
-procedure TCustomLog.Log(const ALvl: TLogLvl; const ATxt: string);
+procedure TCustomLog.Log(const InLvl: TLogLvl; const InTxt: UnicodeString);
 { Main logging procedure. In this instance, redirect all
   parameters to its encapsulated callback }
 begin
   if Assigned(FCb) then
-    FCb(ALvl, UTF8Decode(ATxt));
+    FCb(InLvl, InTxt);
 end;
 
 end.

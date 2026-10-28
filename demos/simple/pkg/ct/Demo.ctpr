@@ -62,7 +62,7 @@
     </RunParams>
     <RequiredPackages>
       <Item>
-        <PackageName Value="glv_log_lib"/>
+        <PackageName Value="glv_log_def_engine"/>
       </Item>
     </RequiredPackages>
     <Units>

@@ -2,14 +2,13 @@
   This source is only used to compile and install the package.
  }
 
-unit glv_log_lib;
+unit glv_log_contract;
 
 {$warn 5023 off : no warning about unused units}
 interface
 
 uses
-  GlvLog, GlvLogBase, GlvLogFileOps, GlvLogFiles, GlvLogGroup, GlvLogTypes, 
-  GlvLogContract, GlvLogEngine, GlvLogConsole;
+  GLV.Log.Engine, GLV.Log, GLV.Log.Lvl;
 
 implementation
 

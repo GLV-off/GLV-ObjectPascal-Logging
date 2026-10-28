@@ -1,4 +1,4 @@
-unit GlvLogConsole;
+unit GLV.Log.ConsoleEngine;
 
 {$I 'glv_log_lib.inc'}
 
@@ -9,8 +9,8 @@ implementation
 uses
   SysUtils,
   Classes,
-  GlvLogTypes,
-  GlvLogEngine;
+  GLV.Log.Lvl,
+  GLV.Log.Engine;
 
 class procedure ConsoleLog(const ALvl: TLogLvl; const ATxt: UnicodeString);
 begin

@@ -1,29 +1,29 @@
 {
- Module:       GlvLogContract
+ Module:       GLV.Log
  Author:       GLV_off
- Description:
- History:      2026-10-28: Created
+ Description:  Basic types of logging library.
+ History:      2026-08-10: Created
 }
-unit GlvLogContract;
+unit GLV.Log;
 
 {$I 'glv_log_lib.inc'}
 
 interface
 
 uses
-  GlvLogTypes,
-  GlvLogEngine;
+  GLV.Log.Lvl,
+  GLV.Log.Engine;
 
 const
-  llInfo = GlvLogTypes.TLoglvl.llInfo;
-  llError = GlvLogTypes.TLoglvl.llError;
-  llWarn = GlvLogTypes.TLoglvl.llWarn;
-  llDebug = GlvLogTypes.TLoglvl.llDebug;
+  llInfo = GLV.Log.Lvl.TLoglvl.llInfo;
+  llError = GLV.Log.Lvl.TLoglvl.llError;
+  llWarn = GLV.Log.Lvl.TLoglvl.llWarn;
+  llDebug = GLV.Log.Lvl.TLoglvl.llDebug;
 
 type
-  TLogLvl = GlvLogTypes.TLogLvl;
-  TLogEngine = GlvLogEngine.TLogEngine;
-  TLogEngineCallback = GlvLogEngine.TLogEngineCallback;
+  TLogLvl = GLV.Log.Lvl.TLogLvl;
+  TLogEngine = GLV.Log.Engine.TLogEngine;
+  TLogEngineCallback = GLV.Log.Engine.TLogEngineCallback;
 
 procedure LogInfo(const InTxt: UnicodeString);
 procedure LogError(const InTxt: UnicodeString);
@@ -53,3 +53,4 @@ begin
 end;
 
 end.
+
