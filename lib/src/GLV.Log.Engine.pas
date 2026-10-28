@@ -76,7 +76,7 @@ begin
         Self.Proc(InLvl, InTxt);
     lecNil:
       begin
-        { todo: raise Exception? }
+        { todo: raise Exception or fallback to stderr ? }
         raise ELoggingEngineNotInitialized.Create('Not initialized engine!');
       end;
   end;

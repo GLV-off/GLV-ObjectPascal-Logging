@@ -8,7 +8,7 @@ unit glv_log_def_engine;
 interface
 
 uses
-  GLV.Log.ConsoleEngine;
+  GLV.Log.ConsoleEngine, GLV.Log.SyncFileEngine;
 
 implementation
 
