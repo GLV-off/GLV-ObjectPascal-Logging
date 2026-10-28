@@ -16,14 +16,14 @@ unit GlvLog;
 interface
 
 uses
-  Glv.Log.Types,
+  GLV.Log.Lvl,
   GlvLogBase,
   GlvLogCustom,
   GlvLogGroup,
   GlvLogFiles;
 
 type
-  TLogLvl = Glv.Log.Types.TLogLvl;
+  TLogLvl = GLV.Log.Lvl.TLogLvl;
   TLogCb = GlvLogCustom.TLogCb;
 
   TLog = GlvLogBase.TLog;
@@ -61,7 +61,7 @@ type
   end;
 
 const
-  LogLvlAsStr: function(const X: TLogLvl): UnicodeString = @Glv.Log.Types.LogLvlAsStr;
+  LogLvlAsStr: function(const X: TLogLvl): UnicodeString = @GLV.Log.Lvl.LogLvlAsStr;
 
 procedure Info(const ATxt: string);
 procedure Warn(const ATxt: string);

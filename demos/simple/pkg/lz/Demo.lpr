@@ -2,8 +2,8 @@ program Demo;
 
 uses
   GlvLog,
-  Glv.Log,
-  Glv.Log.ConsoleEngine;
+  GLV.Log,
+  GLV.Log.ConsoleEngine;
 
 procedure DemoV1;
 begin

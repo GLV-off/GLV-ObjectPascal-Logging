@@ -25,16 +25,16 @@
     </CompilerOptions>
     <Files>
       <Item>
-        <Filename Value="..\..\src\Glv.Log.Engine.pas"/>
-        <UnitName Value="Glv.Log.Engine"/>
+        <Filename Value="..\..\src\GLV.Log.Engine.pas"/>
+        <UnitName Value="GLV.Log.Engine"/>
       </Item>
       <Item>
-        <Filename Value="..\..\src\Glv.Log.pas"/>
-        <UnitName Value="Glv.Log"/>
+        <Filename Value="..\..\src\GLV.Log.pas"/>
+        <UnitName Value="GLV.Log"/>
       </Item>
       <Item>
-        <Filename Value="..\..\src\Glv.Log.ConsoleEngine.pas"/>
-        <UnitName Value="Glv.Log.ConsoleEngine"/>
+        <Filename Value="..\..\src\GLV.Log.ConsoleEngine.pas"/>
+        <UnitName Value="GLV.Log.ConsoleEngine"/>
       </Item>
       <Item>
         <Filename Value="..\..\src\GLV.Log.Lvl.pas"/>

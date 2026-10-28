@@ -8,7 +8,7 @@ unit glv_log_v2_lib;
 interface
 
 uses
-  Glv.Log.Engine, Glv.Log.Types, Glv.Log, Glv.Log.ConsoleEngine;
+  GLV.Log.Engine, GLV.Log.Lvl, GLV.Log, GLV.Log.ConsoleEngine;
 
 implementation
 
