@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="6">
+    <CompatibilityMode Value="False"/>
+    <PathDelim Value="\"/>
+    <Name Value="glv_log_v2_lib"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\src"/>
+        <OtherUnitFiles Value="..\..\src"/>
+        <UnitOutputDirectory Value="..\..\out\$(TargetCPU)-$(TargetOS)\$(BuildMode)"/>
+      </SearchPaths>
+      <CodeGeneration>
+        <Optimizations>
+          <OptimizationLevel Value="0"/>
+        </Optimizations>
+      </CodeGeneration>
+      <Linking>
+        <Debugging>
+          <DebugInfoType Value="dsDwarf4"/>
+        </Debugging>
+      </Linking>
+    </CompilerOptions>
+    <Files>
+      <Item>
+        <Filename Value="..\..\src\Glv.Log.Engine.pas"/>
+        <UnitName Value="Glv.Log.Engine"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\Glv.Log.pas"/>
+        <UnitName Value="Glv.Log"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\Glv.Log.ConsoleEngine.pas"/>
+        <UnitName Value="Glv.Log.ConsoleEngine"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GLV.Log.Lvl.pas"/>
+        <UnitName Value="GLV.Log.Lvl"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>
