@@ -80,7 +80,7 @@ SUMMARY|fpc=2|lazbuild=1|delphi=0|tests-dep=1
 bash .pi/skills/pascal-build-probe/scripts/build.sh <target> [<target> ...]
 ```
 
-Цели: `lib-v2`, `lib-v1-ct`, `tests`, `tests-int`, `demo`, `all`.
+Цели: `lib-v2`, `lib-v1-ct`, `tests`, `tests-int`, `demo`, `demo-builder`, `all`.
 Без аргументов — список целей и код `64`; неизвестная цель — ошибка, не
 молчаливый успех. Переменные: `BUILD_MODE=Debug|Release`,
 `FPC=<path>` (переопределить компилятор), `LAZBUILD=<path>`,

@@ -12,7 +12,8 @@
 | lib v1 (CodeTyphon) | `lib/pkg/ct/glv_log_def_engine.ctpkg` | 8 юнитов `GlvLog*` (без `GlvLogConsole`, `GlvLogContract`, `GlvLogEngine`) | `adFCL` | `lib/out/<cpu>-<os>/…` |
 | тесты unit | `test/pkg/lz/Test.lpi` | `Test.lpr`, `LogTestUnit`, `TestEnv`, `TestFileUtils`, `TestReport` | `glv_log_def_engine`, `glv_log_contract`, `GlvTestCross` | `test/out/<cpu>-<os>/{debug,release}` |
 | тесты int | `test/pkg/lz/TestInt.lpi` | `TestInt.lpr`, `LogTestInt`, `TestEnv`, `TestFileUtils`, `TestReport` | `glv_log_def_engine`, `GlvTestCross` | `test/out/<cpu>-<os>/{debug,release}` |
-| демо Lazarus | `demos/simple/pkg/lz/Demo.lpi` | `Demo.lpr` | `glv_log_def_engine`, `glv_log_contract` | `demos/simple/out/<cpu>-<os>/$BuildMode` |
+| демо Lazarus (V2 engine) | `demos/simple/pkg/lz/Demo.lpi` | `Demo.lpr` | `glv_log_def_engine`, `glv_log_contract` | `demos/simple/out/<cpu>-<os>/$BuildMode` |
+| демо Lazarus (Builder) | `demos/builder/pkg/lz/BuilderDemo.lpi` | `BuilderDemo.lpr`, `BuilderDemoApp` | `glv_log_def_engine`, `glv_log_contract` | `demos/builder/out/<cpu>-<os>/$BuildMode` |
 | демо CodeTyphon | `demos/simple/pkg/ct/Demo.ctpr` | `Demo.lpr` | CodeTyphon IDE | — (не проверялось) |
 | демо Delphi | `demos/simple/pkg/delphi/Demo.dproj` | `DemoApp` + `Demo.dpr` | Delphi + `demo.inc` (отсутствует) | — (не проверялось) |
 
@@ -26,8 +27,10 @@
 - `Test.lpi`/`TestInt.lpi` дополнительно берут `..\..\src` в `OtherUnitFiles`,
   поэтому один и тот же тест-юнит может компилироваться и из пакета, и из
   исходников. Дубликаты не «исправлять» здесь — это задача `pascal-package-sync`.
-- `demo.inc` отсутствует; `DemoApp.pas` не входит в `Demo.lpi` (в `.dproj`
-  входит). Демо через Lazarus собирается, через Delphi — нет.
+- В `demos/simple` отсутствует `demo.inc`; `DemoApp.pas` не входит в
+  `Demo.lpi` (в `.dproj` входит). Демо через Lazarus собирается, через
+  Delphi — нет. `demos/builder` не использует `demo.inc` и собирает
+  `BuilderDemoApp.pas` в составе `BuilderDemo.lpi`.
 
 ## 2. Команды
 
@@ -37,6 +40,7 @@ bash .pi/skills/pascal-build-probe/scripts/probe.sh
 
 # Одна цель / все цели (lazbuild с фолбэком на fpc)
 bash .pi/skills/pascal-build-probe/scripts/build.sh tests
+bash .pi/skills/pascal-build-probe/scripts/build.sh demo-builder
 bash .pi/skills/pascal-build-probe/scripts/build.sh all
 
 # Другой режим и принудительный фолбэк
@@ -58,7 +62,8 @@ LAZBUILD=off       bash .pi/skills/pascal-build-probe/scripts/build.sh all
 - `lib/out/<cpu>-<os>/` — пакеты: `default/`, `Debug/`, `Release/`.
 - `test/out/<cpu>-<os>/` — проекты: `debug/`, `release/` (строчные, заданы
   явно в `.lpi`).
-- `demos/simple/out/<cpu>-<os>/` — `Debug/` (через `$(BuildMode)`).
+- `demos/simple/out/<cpu>-<os>/` и `demos/builder/out/<cpu>-<os>/` —
+  `Debug/` (через `$(BuildMode)`).
 - `out/probe/` — логи и временные юниты скилла; в git не входит.
 
 Каталоги `BuildMode` не унифицированы. Не «приводить к одному виду» без

@@ -25,7 +25,7 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null | tr -d '\r')"
 cd "$ROOT" 2>/dev/null || { echo "RESULT|error|fail|нет каталога $ROOT"; exit 2; }
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-TARGETS_ALL="lib-v2 lib-v1-ct tests tests-int demo"
+TARGETS_ALL="lib-v2 lib-v1-ct tests tests-int demo demo-builder"
 BUILD_MODE="${BUILD_MODE:-Debug}"
 
 usage() {
@@ -36,6 +36,7 @@ usage() {
   echo "  tests       test/pkg/lz/Test.lpi    (unit-тесты)"
   echo "  tests-int   test/pkg/lz/TestInt.lpi (интеграционные тесты)"
   echo "  demo        demos/simple/pkg/lz/Demo.lpi"
+  echo "  demo-builder demos/builder/pkg/lz/BuilderDemo.lpi"
   echo "  all         все цели по порядку"
   echo "Env: BUILD_MODE=${BUILD_MODE} (Debug|Release), FPC=..., LAZBUILD=..."
 }
@@ -128,8 +129,10 @@ build_lib_v1_ct() {
   fi
 }
 
-build_project() { # build_project <target> <lpi> <lpr>
-  local target="$1" lpi="$2" lpr="$3"
+build_project() { # build_project <target> <lpi> <lpr> [<extra unit dir>]
+  local target="$1" lpi="$2" lpr="$3" extra="${4:-}"
+  local extra_fu=()
+  [ -n "$extra" ] && extra_fu=(-Fu"$(wpath "$extra")")
   local log="$LOGDIR/$target-$STAMP.log"
   : >"$log"
   if [ -n "$LAZBUILD_BIN" ]; then
@@ -143,7 +146,7 @@ build_project() { # build_project <target> <lpi> <lpr>
   if [ -z "$FPC_BIN" ]; then finish "$target" skipped "нет ни lazbuild, ни fpc"; return; fi
   local u; u="$(fpc_units_dir "$target")"
   local ed; ed="$LOGDIR/bin-$target"; mkdir -p "$ed"
-  if run_log "$log" "$FPC_BIN" -Mdelphi \
+  if run_log "$log" "$FPC_BIN" -Mdelphi "${extra_fu[@]}" \
        -Fu"$(wpath "$ROOT/lib/src")" -Fu"$(wpath "$ROOT/test/src")" \
        -Fu"$(wpath "$ROOT/../pas_TestingWrapper/Src")" \
        -Fi"$(wpath "$ROOT/lib/src")" -Fi"$(wpath "$ROOT/test/src")" \
@@ -163,6 +166,7 @@ for t in "$@"; do
              tests) build_project tests test/pkg/lz/Test.lpi test/pkg/lz/Test.lpr ;;
              tests-int) build_project tests-int test/pkg/lz/TestInt.lpi test/pkg/lz/TestInt.lpr ;;
              demo) build_project demo demos/simple/pkg/lz/Demo.lpi demos/simple/pkg/lz/Demo.lpr ;;
+             demo-builder) build_project demo-builder demos/builder/pkg/lz/BuilderDemo.lpi demos/builder/pkg/lz/BuilderDemo.lpr "$ROOT/demos/builder/src" ;;
            esac
          done ;;
     lib-v2) build_lib_v2 ;;
@@ -170,6 +174,7 @@ for t in "$@"; do
     tests) build_project tests test/pkg/lz/Test.lpi test/pkg/lz/Test.lpr ;;
     tests-int) build_project tests-int test/pkg/lz/TestInt.lpi test/pkg/lz/TestInt.lpr ;;
     demo) build_project demo demos/simple/pkg/lz/Demo.lpi demos/simple/pkg/lz/Demo.lpr ;;
+    demo-builder) build_project demo-builder demos/builder/pkg/lz/BuilderDemo.lpi demos/builder/pkg/lz/BuilderDemo.lpr "$ROOT/demos/builder/src" ;;
   esac
 done
 
