@@ -6,7 +6,7 @@ Minimal object-based API: assign log levels, write to console, to files
 
 ## Features
 
-- Object-oriented API based on a single abstract `TLog` with a `Log(ALvl, ATxt)` method
+- Object-oriented API based on a single abstract `TLog` with a `Log(InLvl, InTxt)` method
 - Built-in log levels: `llInfo`, `llDebug`, `llError`, `llWarn`
 - Loggers:
   - console output (`TCustomLog` + `TConsole`)
@@ -29,7 +29,7 @@ Minimal object-based API: assign log levels, write to console, to files
 
 Option 1 - via Lazarus package:
 
-1. Open `lib/pkg/lz/glv_log_lib.lpk` with the Lazarus IDE
+1. Open `lib/pkg/lz/glv_log_def_engine.lpk` with the Lazarus IDE
 2. Compile/install the package or add it to your project's required packages
 
 Option 2 - without an IDE: add `lib/src` to your project's unit search path
@@ -92,7 +92,7 @@ LogLvlAsStr(llWarn) { returns 'WARN' }
 
 | Class | Description |
 |---|---|
-| `TLog` | Abstract base - the single logging interface (`Log(ALvl, ATxt)`) |
+| `TLog` | Abstract base - the single logging interface (`Log(InLvl, InTxt)`) |
 | `TCustomLog` | Redirects logging to a user-provided callback (`TLogCb`) |
 | `TGroupLog` | Fan-out: forwards each message to all nested loggers |
 | `TPrimitiveFileLog` | Simple sync file logger (rewrites the file on each message) |

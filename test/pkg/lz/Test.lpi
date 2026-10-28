@@ -61,13 +61,13 @@
     </RunParams>
     <RequiredPackages>
       <Item>
-        <PackageName Value="glv_log_v2_lib"/>
+        <PackageName Value="glv_log_def_engine"/>
+      </Item>
+      <Item>
+        <PackageName Value="glv_log_contract"/>
       </Item>
       <Item>
         <PackageName Value="GlvTestCross"/>
-      </Item>
-      <Item>
-        <PackageName Value="glv_log_lib"/>
       </Item>
     </RequiredPackages>
     <Units>

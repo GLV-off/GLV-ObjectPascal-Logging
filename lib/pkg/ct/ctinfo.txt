@@ -4,7 +4,7 @@
   Package Information file
 =============================================
 
-glv_log_lib
+glv_log_def_engine
 
 Version: 0.0 Date: 2026-09-24 16:06
 

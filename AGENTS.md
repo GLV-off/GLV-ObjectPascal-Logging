@@ -13,7 +13,7 @@
 lib/src/            исходники библиотеки (единственное место с логикой)
   glv_log_lib.inc     общий include компилятора: {$MODE DELPHI}{$H+} для FPC
   GlvLogTypes.pas     TLogLvl (llInfo, llDebug, llError, llWarn) + AsStr/LogLvlAsStr
-  GlvLogBase.pas      абстрактный TLog — единственный метод Log(ALvl, ATxt)
+  GlvLogBase.pas      абстрактный TLog — единственный метод Log(InLvl, InTxt: UnicodeString)
   GlvLogCustom.pas    TCustomLog + TLogCb (callback of object)
   GlvLogGroup.pas     TGroupLog — fan-out, владеет детьми
   GlvLogFiles.pas     TPrimitiveFileLog (sync), TAsyncFileLog + TAsyncLogThread
@@ -21,8 +21,10 @@ lib/src/            исходники библиотеки (единствен�
   GlvLogDev.pas       DevLog* — прямой WriteLn, API нестабилен, в фасад не входит
   GlvLog.pas          фасад: алиасы типов, TConsole, TLogging.Inst, Info/Warn/Error/Debug(+Fmt)
   backup/             старые версии юнитов, не в сборке — не трогать
-lib/pkg/lz/         Lazarus-пакет glv_log_lib.lpk (+ автоген. glv_log_lib.pas — DO NOT EDIT)
-lib/pkg/ct/         Code Typhon пакет (ctpkg, ctpkg.ctinfo), тот же автоген-юнит
+lib/pkg/lz/         Lazarus-пакеты: glv_log_def_engine.lpk (GlvLog* + GLV.Log.ConsoleEngine)
+                    и glv_log_contract.lpk (GLV.Log, GLV.Log.Lvl, GLV.Log.Engine)
+                    (+ автоген. одноимённые *.pas — DO NOT EDIT)
+lib/pkg/ct/         Code Typhon пакет glv_log_def_engine (ctpkg, ctinfo.txt, тот же автоген-юнит)
 test/src/           тесты: LogTestUnit (unit), LogTestInt (integration), TestEnv, TestFileUtils
 test/pkg/lz/        Test.lpr (unit), TestInt.lpr (integration) + .lpi проекты
 demos/simple/       демо: src/DemoApp.pas, pkg/{lz,ct,delphi}
@@ -39,11 +41,11 @@ FPC в PATH на текущей машине отсутствует (`which fpc`
 сборку можно лишь при установленном Lazarus/Typhon; если компилятора нет —
 честно сообщить, что сборка не проверена, не выдумывать результат.
 
-- Библиотека: открыть `lib/pkg/lz/glv_log_lib.lpk` → Compile/Install, либо добавить `lib/src` в unit search path.
+- Библиотека: открыть `lib/pkg/lz/glv_log_def_engine.lpk` (v1) или `lib/pkg/lz/glv_log_contract.lpk` (v2) → Compile/Install, либо добавить `lib/src` в unit search path.
 - Демо: `demos/simple/pkg/lz/Demo.lpi` (Run), `.../ct/Demo.ctpr`, `.../delphi/Demo.dproj`.
 - Тесты: `test/pkg/lz/Test.lpi` и `TestInt.lpi`. Оба требуют установленный пакет
   **`GlvTestCross`** из соседнего репозитория `../pas_TestingWrapper`
-  (`Pkg/LZ/glvtestcross.lpk`) и пакет `glv_log_lib`. Без них тесты не соберутся.
+  (`Pkg/LZ/glvtestcross.lpk`) и пакет `glv_log_def_engine` (TestInt.lpi) либо `glv_log_contract` (Test.lpi). Без них тесты не соберутся.
 - FPC напрямую (если include-файлы вне дерева юнита):
   `fpc -Mdelphi -Fulib/src -Filb/src -FUout/debug test/pkg/lz/Test.lpr`
 - Выход: `out/<TargetCPU>-<TargetOS>/{Debug|Release|debug|release}`; имена каталогов
@@ -57,16 +59,18 @@ FPC в PATH на текущей машине отсутствует (`which fpc`
   тесты — с `{$I 'glv_log_test.inc'}`. Не заменять на инлайн-директивы.
 - Шапка юнита — комментарий-блок: `Module: / Author: / Description: / History:`
   (`History: YYYY-MM-DD: Created`). Новые юниты оформлять так же.
-- Имена: типы/классы `T...`, поля `F...`, параметры `A...`, приватные `strict private/protected`.
+- Имена: типы/классы `T...`, поля `F...`, параметры `A...` (входные параметры API — `In...`,
+  как в `GLV.Log.*` и `TLog.Log`), приватные `strict private/protected`.
 - `TLog` — `class abstract(TInterfacedObject)`; наследники переопределяют только
-  `procedure Log(const ALvl: TLogLvl; const ATxt: string); override;`.
+  `procedure Log(const InLvl: TLogLvl; const InTxt: UnicodeString); override;`
+  (текст — `UnicodeString`, кодированием в байты занимается конкретный логгер).
   Комментарии к публичным членам — в стиле `{ ... }` перед объявлением (уже так везде).
 - Владедение: `TGroupLog` освобождает переданные ему логгеры; `TLogging.Inst` (сеттер)
   освобождает предыдущий экземпляр; остальные логгеры освобождает вызывающий (`FreeAndNil`).
   Не смешивать с подсчётом ссылок интерфейсов — объекты не передаются как интерфейсы.
 - Один файл = один модуль; не добавлять `uses` в интерфейс без нужды (Facade намеренно
   тонкий). Файлы в CRLF, исходники в основном ASCII — сохранять переносы строк и кодировку.
-- Пакетные юниты `lib/pkg/*/glv_log_lib.pas` автогенерируются IDE — не редактировать;
+- Пакетные юниты `lib/pkg/lz/*.pas` и `lib/pkg/ct/*.pas` автогенерируются IDE — не редактировать;
   новый юнит добавлять в `.lpk`/`.ctpkg` через IDE.
 
 ## Контракты, которые нельзя ломать (на них завязаны тесты)
@@ -96,8 +100,12 @@ FPC в PATH на текущей машине отсутствует (`which fpc`
 - `TAsyncLogThread.Destroy` сбрасывает только `FBuffer`, очередь `FQueue` теряется.
 - `TPrimitiveFileLog` читает и перезаписывает файл целиком на каждое сообщение —
   не для больших логов; `UTF8Encode(FFilename)` при передаче в `FileExists/LoadFromFile`.
-- `TCustomLog.Log` делает `UTF8Decode(ATxt)` перед `TLogCb` (`UnicodeString`):
-  в FPC это осмысленно, в Delphi (`string` = `UnicodeString`) — потенциальное искажение.
+- Кодировки: `TLog.Log`/`TLogCb` — `UnicodeString`; файловые логгеры сами кодируют в UTF-8
+  (`UTF8Encode` + `RawByteString` в `TPrimitiveFileLog` и `GlvLogFileOps.WriteLines`).
+  Остаётся ловушка `Format`: в FPC он работает через `AnsiString`, поэтому
+  `Format('%s', [UnicodeString])` теряет не-ASCII (`???`) на не-UTF-8 системной
+  кодировке; `Info/Warn/Error/Debug` минуют `Format` (прямой `Log`), а
+  `InfoFmt/WarnFmt/ErrorFmt/DebugFmt` (и любой `Format` внутри логгера) — Unicode-safe не гарантированы.
 - Фасад `GlvLog` экспортирует `TAsyncFileLogThread`, а README-пример использует
   `TAsyncLogThread` — пример требует `GlvLogFiles` в `uses`.
 - `GlvLogDev`/`GlvLogFileOps` — внутренние, в фасад не входят; `TestFileOps` помечен `@deprecated`.

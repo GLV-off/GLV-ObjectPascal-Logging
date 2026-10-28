@@ -58,7 +58,7 @@ type
       its nested childrens who place will be in FItems
       container.
     }
-    procedure Log(const ALvl: TLogLvl; const ATxt: string); override;
+    procedure Log(const InLvl: TLogLvl; const InTxt: UnicodeString); override;
   end;
 
 implementation
@@ -80,13 +80,13 @@ begin
   inherited Destroy;
 end;
 
-procedure TGroupLog.Log(const ALvl: TLogLvl; const ATxt: string);
+procedure TGroupLog.Log(const InLvl: TLogLvl; const InTxt: UnicodeString);
 var
   I: Integer;
 begin
   for I := 0 to FItems.Count - 1 do
     if Assigned(FItems[I]) then
-      FItems[I].Log(Alvl, ATxt);
+      FItems[I].Log(InLvl, InTxt);
 end;
 
 end.

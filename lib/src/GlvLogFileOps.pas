@@ -123,7 +123,9 @@ type
 var
   Buf: TBuf;
   Stream: TFileStream;
-  Line: string;
+  { RawByteString + UTF8Encode: the file is UTF-8, so lines must
+    not be re-encoded to DefaultSystemCodePage while writing. }
+  Line: RawByteString;
   I: Integer;
 begin
   Result := False;
@@ -143,7 +145,7 @@ begin
 
       for I := 0 to Length(ALines) - 1 do
       begin
-        Line := ALines[i] + sLineBreak;
+        Line := UTF8Encode(ALines[I] + sLineBreak);
         Stream.WriteBuffer(Line[1], Length(Line));
       end;
 

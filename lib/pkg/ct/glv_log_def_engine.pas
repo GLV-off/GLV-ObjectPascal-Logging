@@ -2,7 +2,7 @@
   This source is only used to compile and install the package.
  }
 
-unit glv_log_lib;
+unit glv_log_def_engine;
 
 {$warn 5023 off : no warning about unused units}
 interface
@@ -18,5 +18,5 @@ begin
 end;
 
 initialization
-  RegisterPackage('glv_log_lib', @Register);
+  RegisterPackage('glv_log_def_engine', @Register);
 end.

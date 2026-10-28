@@ -3,7 +3,7 @@
   <Package Version="6">
     <CompatibilityMode Value="False"/>
     <PathDelim Value="\"/>
-    <Name Value="glv_log_v2_lib"/>
+    <Name Value="glv_log_contract"/>
     <CompilerOptions>
       <Version Value="11"/>
       <PathDelim Value="\"/>
@@ -31,10 +31,6 @@
       <Item>
         <Filename Value="..\..\src\GLV.Log.pas"/>
         <UnitName Value="GLV.Log"/>
-      </Item>
-      <Item>
-        <Filename Value="..\..\src\GLV.Log.ConsoleEngine.pas"/>
-        <UnitName Value="GLV.Log.ConsoleEngine"/>
       </Item>
       <Item>
         <Filename Value="..\..\src\GLV.Log.Lvl.pas"/>

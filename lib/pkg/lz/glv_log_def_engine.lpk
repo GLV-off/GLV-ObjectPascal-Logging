@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="6">
+    <PathDelim Value="\"/>
+    <Name Value="glv_log_def_engine"/>
+    <Type Value="RunTimeOnly"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\src"/>
+        <Libraries Value="..\..\out\$(TargetCPU)-$(TargetOS)\$(BuildMode)"/>
+        <OtherUnitFiles Value="..\..\src"/>
+        <UnitOutputDirectory Value="..\..\out\$(TargetCPU)-$(TargetOS)\$(BuildMode)"/>
+      </SearchPaths>
+      <CodeGeneration>
+        <Optimizations>
+          <OptimizationLevel Value="0"/>
+        </Optimizations>
+      </CodeGeneration>
+    </CompilerOptions>
+    <Files>
+      <Item>
+        <Filename Value="..\..\src\GLV.Log.ConsoleEngine.pas"/>
+        <UnitName Value="GLV.Log.ConsoleEngine"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+      <Item>
+        <PackageName Value="glv_log_contract"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

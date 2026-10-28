@@ -25,6 +25,7 @@ type
     procedure FakeLog(const ALvl: TLogLvl; const ATxt: UnicodeString);
   published
     procedure TestHookUp;
+    procedure TestUnicodeText;
   end;
 
   TLogLvlTest = class(TCrossTestCase)
@@ -37,6 +38,11 @@ implementation
 uses
   DateUtils,
   SysUtils;
+
+const
+  { U+4E2D and U+1F600: not representable in single-byte code pages,
+    so an implicit UnicodeString -> AnsiString conversion is visible. }
+  UnicodeText: UnicodeString = #$4E2D#$1F600;
 
 procedure TDemosTest.TestDateUtils;
 var
@@ -77,6 +83,19 @@ begin
     L.Log(TLogLvl.llDebug, 'test');
     Assert.AreEqual(Ord(FLastLvl), Ord(TLogLvl.llDebug), 'lvl not match');
     Assert.AreEqual(UnicodeString('test'), FLastLogged, 'text not match!');
+  finally
+    FreeAndNil(L);
+  end;
+end;
+
+procedure TCustomLogTest.TestUnicodeText;
+var
+  L: TLog;
+begin
+  L := TCustomLog.Create(Self.FakeLog);
+  try
+    L.Log(TLogLvl.llInfo, UnicodeText);
+    Assert.AreEqual(UnicodeText, FLastLogged, 'unicode text corrupted on the way to callback');
   finally
     FreeAndNil(L);
   end;

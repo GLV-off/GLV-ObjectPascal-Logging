@@ -63,10 +63,10 @@ type
 const
   LogLvlAsStr: function(const X: TLogLvl): UnicodeString = @GLV.Log.Lvl.LogLvlAsStr;
 
-procedure Info(const ATxt: string);
-procedure Warn(const ATxt: string);
-procedure Error(const ATxt: string);
-procedure Debug(const ATxt: string);
+procedure Info(const ATxt: UnicodeString);
+procedure Warn(const ATxt: UnicodeString);
+procedure Error(const ATxt: UnicodeString);
+procedure Debug(const ATxt: UnicodeString);
 
 procedure InfoFmt(const InFmt: string; const InArgs: array of const);
 procedure WarnFmt(const InFmt: string; const InArgs: array of const);
@@ -79,24 +79,24 @@ uses
   SysUtils,
   Classes;
 
-procedure Info(const ATxt: string);
+procedure Info(const ATxt: UnicodeString);
 begin
-  InfoFmt('%s', [ATxt]);
+  TLogging.Inst.Log(TLogLvl.llInfo, ATxt);
 end;
 
-procedure Warn(const ATxt: string);
+procedure Warn(const ATxt: UnicodeString);
 begin
-  WarnFmt('%s', [ATxt]);
+  TLogging.Inst.Log(TLogLvl.llWarn, ATxt);
 end;
 
-procedure Error(const ATxt: string);
+procedure Error(const ATxt: UnicodeString);
 begin
-  ErrorFmt('%s', [ATxt]);
+  TLogging.Inst.Log(TLogLvl.llError, ATxt);
 end;
 
-procedure Debug(const ATxt: string);
+procedure Debug(const ATxt: UnicodeString);
 begin
-  DebugFmt('%s', [ATxt]);
+  TLogging.Inst.Log(TLogLvl.llDebug, ATxt);
 end;
 
 procedure InfoFmt(const InFmt: string; const InArgs: array of const);

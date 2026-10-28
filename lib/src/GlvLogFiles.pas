@@ -30,13 +30,15 @@ type
   public type
     TLogRec = record
       Lvl: TLogLvl;
-      Txt: string;
+      Txt: UnicodeString;
     end;
 
     TLogRecQueue = TQueue<TLogRec>;
   strict private
     FSync: TSynchroObject;
-    FBuffer: TStringList;
+    { Buffer of already formatted lines. UnicodeString is used to
+      avoid lossy AnsiString round-trips inside the thread. }
+    FBuffer: TList<UnicodeString>;
     FQueue: TLogRecQueue;
     FFilepath: string;
   protected
@@ -45,7 +47,7 @@ type
     constructor Create(const AFilepath: string);
     destructor Destroy; override;
 
-    procedure Log(const ALvl: TLogLvl; const ATxt: string);
+    procedure Log(const InLvl: TLogLvl; const InTxt: UnicodeString);
   end;
 
   {
@@ -61,7 +63,7 @@ type
     constructor Create(const AFilepath: UnicodeString); overload;
     constructor Create(const AThread: TAsyncLogThread); overload;
     destructor Destroy; override;
-    procedure Log(const ALvl: TLogLvl; const ATxt: string); override;
+    procedure Log(const InLvl: TLogLvl; const InTxt: UnicodeString); override;
   end;
 
   {
@@ -92,7 +94,7 @@ type
     constructor Create(const AFilename: UnicodeString; const ADateTimeFunc: TDateTimeFunc); overload;
     constructor Create(const AFilename: UnicodeString); overload;
     destructor Destroy; override;
-    procedure Log(const ALvl: TLogLvl; const ATxt: string); override;
+    procedure Log(const InLvl: TLogLvl; const InTxt: UnicodeString); override;
   end;
 
 implementation
@@ -121,7 +123,9 @@ begin
             Break;
           R := FQueue.Dequeue();
           //FBuffer.Insert(0, Format('[%s]: %s',[R.Lvl.AsStr, R.Txt]));
-          FBuffer.Add(Format('[%s]: %s',[R.Lvl.AsStr, R.Txt]));
+          { Concatenation instead of Format: FPC's Format works via
+            AnsiString and would silently lose non-ASCII text. }
+          FBuffer.Add('[' + R.Lvl.AsStr + ']: ' + R.Txt);
           Dec(C);
         end;
       end;
@@ -137,7 +141,7 @@ begin
         SetLength(Lines, FBuffer.Count);
         for I := 0 to FBuffer.Count - 1 do
         begin
-          Lines[I] := UTF8Decode(FBuffer[I]);
+          Lines[I] := FBuffer[I];
         end;
         WriteLines(FFilepath, Lines);
         SetLength(Lines, 0);
@@ -158,7 +162,7 @@ begin
   FreeOnTerminate := False;
 
   FSync := TCriticalSection.Create;
-  FBuffer := TStringList.Create();
+  FBuffer := TList<UnicodeString>.Create();
   FBuffer.Clear;
   FQueue := TLogRecQueue.Create;
   FQueue.Clear;
@@ -176,7 +180,7 @@ begin
     SetLength(Lines, FBuffer.Count);
     for I := 0 to FBuffer.Count - 1 do
     begin
-      Lines[I] := UTF8Decode(FBuffer[I]);
+      Lines[I] := FBuffer[I];
     end;
     WriteLines(FFilepath, Lines);
   end;
@@ -186,7 +190,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TAsyncLogThread.Log(const ALvl: TLogLvl; const ATxt: string);
+procedure TAsyncLogThread.Log(const InLvl: TLogLvl; const InTxt: UnicodeString);
 var
   R: TLogRec;
 begin
@@ -195,8 +199,8 @@ begin
 
   FSync.Acquire;
   try
-    R.Lvl := ALvl;
-    R.Txt := ATxt;
+    R.Lvl := InLvl;
+    R.Txt := InTxt;
     FQueue.Enqueue(R);
   finally
     FSync.Release;
@@ -224,9 +228,9 @@ begin
   inherited Destroy;
 end;
 
-procedure TAsyncFileLog.Log(const ALvl: TLogLvl; const ATxt: string);
+procedure TAsyncFileLog.Log(const InLvl: TLogLvl; const InTxt: UnicodeString);
 begin
-  FThread.Log(ALvl, ATxt);
+  FThread.Log(InLvl, InTxt);
 end;
 
 function TPrimitiveFileLog.GetDatetime: TDatetime;
@@ -257,12 +261,12 @@ begin
   inherited Destroy;
 end;
 
-procedure TPrimitiveFileLog.Log(const ALvl: TLogLvl; const ATxt: string);
+procedure TPrimitiveFileLog.Log(const InLvl: TLogLvl; const InTxt: UnicodeString);
 var
   Items: TStringList;
-  LevelStr: string;
+  LevelStr: UnicodeString;
 begin
-  LevelStr := Alvl.AsStr();
+  LevelStr := InLvl.AsStr();
 
   FSync.Acquire;
   Items := TStringList.Create();
@@ -270,7 +274,9 @@ begin
     if FileExists(UTF8Encode(FFilename)) then
       Items.LoadFromFile(UTF8Encode(FFilename));
 
-    Items.Add(FormatDateTime('yyyy-mm-dd hh:nn:ss', GetDatetime) + ' [' + LevelStr + '] ' + ATxt);
+    { UTF8Encode keeps the file UTF-8: an implicit UnicodeString ->
+      AnsiString conversion would encode to DefaultSystemCodePage. }
+    Items.Add(UTF8Encode(FormatDateTime('yyyy-mm-dd hh:nn:ss', GetDatetime) + ' [' + LevelStr + '] ' + InTxt));
     Items.SaveToFile(UTF8Encode(FFilename));
   finally
     FreeAndNil(Items);

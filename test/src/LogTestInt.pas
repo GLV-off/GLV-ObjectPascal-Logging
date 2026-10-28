@@ -17,6 +17,7 @@ type
     procedure TearDown; override;
   published
     procedure TestPrimitiveFileLog;
+    procedure TestPrimitiveFileLogUnicode;
   end;
 
   TAsyncFileLogTest = class(TCrossTestCase)
@@ -39,6 +40,12 @@ uses
   Classes,
   GlvLog,
   TestEnv;
+
+const
+  { U+4E2D and U+1F600: not representable in single-byte code pages.
+    TstReadLines decodes the file as UTF-8, so a non-UTF-8 write
+    (implicit DefaultSystemCodePage conversion) shows up as '?'. }
+  UnicodeText: UnicodeString = #$4E2D#$1F600;
 
 function StaticDateTime: TDatetime;
 begin
@@ -83,6 +90,27 @@ begin
     Assert.AreEqual('2026-08-09 12:30:00 [ERROR] error text', Line, 'line[2] written in log not match!');
     Line := Lines[3];
     Assert.AreEqual('2026-08-09 12:30:00 [WARN] warn text', Line, 'line[2] written in log not match!');
+  finally
+    SetLength(Lines, 0);
+    FreeAndNil(L);
+    TstDeleteFile(FFilepath);
+  end;
+end;
+
+procedure TFileLogTest.TestPrimitiveFileLogUnicode;
+var
+  L: TPrimitiveFileLog;
+  Lines: TLines;
+begin
+  L := TPrimitiveFileLog.Create(FFilepath, @StaticDateTime);
+  Lines := [];
+  try
+    L.Log(TLogLvl.llInfo, UnicodeText);
+
+    Lines := TstReadLines(FFilepath);
+    Assert.AreEqual(NativeInt(1), Length(Lines), 'unexpected readed lines count');
+    Assert.AreEqual('2026-08-09 12:30:00 [INFO] ' + UnicodeText, Lines[0],
+      'unicode text written to file is not UTF-8 or corrupted');
   finally
     SetLength(Lines, 0);
     FreeAndNil(L);
