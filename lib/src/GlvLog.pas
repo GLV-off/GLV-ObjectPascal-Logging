@@ -4,10 +4,13 @@
  Description:  Library facade unit. Includes and redeclares
  -             all common classes,types and routines
  -             for general usage.
- -             And for common user experience, contains single
- -             class singleton - Tlogging. Contains active at
- -             application logging configuration of object's.
+ -             Kept for the V1 code base; new code is expected to use
+ -             GLV.Log.* modules (GLV.Log.Builder, GLV.Log.Holder).
  History:      2026-08-10: Created
+ -             2026-10-28: V1 Info/Warn/Error/Debug(+Fmt) procedures
+ -                         removed, TConsole aliased to
+ -                         GLV.Log.ConsoleSink, TLockLog/TLogBuilder
+ -                         aliases added, TLogging marked deprecated
 }
 unit GlvLog;
 
@@ -17,6 +20,9 @@ interface
 
 uses
   GLV.Log.Lvl,
+  GLV.Log.ConsoleSink,
+  GLV.Log.Lock,
+  GLV.Log.Builder,
   GlvLogBase,
   GlvLogCustom,
   GlvLogGroup,
@@ -33,11 +39,19 @@ type
   TAsyncFileLog = GlvLogFiles.TAsyncFileLog;
   TAsyncFileLogThread = GlvLogFiles.TAsyncLogThread;
 
+  TConsole = GLV.Log.ConsoleSink.TConsole;
+  TLockLog = GLV.Log.Lock.TLockLog;
+  TLogBuilder = GLV.Log.Builder.TLogBuilder;
+
   {
    Logging singleton.
 
    By default contains one file logging object and
    custom logging object with console writing implementation
+
+   Deprecated: V1 only. The singleton owns its graph and frees the
+   previous one immediately on reassignment, so it cannot be hot-swapped
+   safely from a worker thread. Use GLV.Log.Holder (V2) instead.
   }
   TLogging = class
   strict private class var
@@ -50,74 +64,15 @@ type
     class destructor Destroy;
 
     class property Inst: TLog read GetLog write SetLog;
-  end;
-
-  {
-   Technical object for console logging implementation.
-  }
-  TConsole = class
-  public
-    class procedure ConsoleLog(const ALvl: TLogLvl; const ATxt: UnicodeString);
-  end;
+  end deprecated;
 
 const
   LogLvlAsStr: function(const X: TLogLvl): UnicodeString = @GLV.Log.Lvl.LogLvlAsStr;
 
-procedure Info(const ATxt: UnicodeString);
-procedure Warn(const ATxt: UnicodeString);
-procedure Error(const ATxt: UnicodeString);
-procedure Debug(const ATxt: UnicodeString);
-
-procedure InfoFmt(const InFmt: string; const InArgs: array of const);
-procedure WarnFmt(const InFmt: string; const InArgs: array of const);
-procedure ErrorFmt(const InFmt: string; const InArgs: array of const);
-procedure DebugFmt(const InFmt: string; const InArgs: array of const);
-
 implementation
 
 uses
-  SysUtils,
-  Classes;
-
-procedure Info(const ATxt: UnicodeString);
-begin
-  TLogging.Inst.Log(TLogLvl.llInfo, ATxt);
-end;
-
-procedure Warn(const ATxt: UnicodeString);
-begin
-  TLogging.Inst.Log(TLogLvl.llWarn, ATxt);
-end;
-
-procedure Error(const ATxt: UnicodeString);
-begin
-  TLogging.Inst.Log(TLogLvl.llError, ATxt);
-end;
-
-procedure Debug(const ATxt: UnicodeString);
-begin
-  TLogging.Inst.Log(TLogLvl.llDebug, ATxt);
-end;
-
-procedure InfoFmt(const InFmt: string; const InArgs: array of const);
-begin
-  TLogging.Inst.Log(TLogLvl.llInfo, Format(InFmt, InArgs));
-end;
-
-procedure WarnFmt(const InFmt: string; const InArgs: array of const);
-begin
-  TLogging.Inst.Log(TLogLvl.llWarn, Format(InFmt, InArgs));
-end;
-
-procedure ErrorFmt(const InFmt: string; const InArgs: array of const);
-begin
-  TLogging.Inst.Log(TLogLvl.llError, Format(InFmt, InArgs));
-end;
-
-procedure DebugFmt(const InFmt: string; const InArgs: array of const);
-begin
-  TLogging.Inst.Log(TLogLvl.llDebug, Format(InFmt, InArgs));
-end;
+  SysUtils;
 
 class function TLogging.GetLog: TLog;
 begin
@@ -144,10 +99,4 @@ begin
   FreeAndNil(FInst);
 end;
 
-class procedure TConsole.ConsoleLog(const ALvl: TLogLvl; const ATxt: UnicodeString);
-begin
-  WriteLn(ALvl.AsStr, ': t.id=', TThread.CurrentThread.ThreadID, ', m=', ATxt);
-end;
-
 end.
-

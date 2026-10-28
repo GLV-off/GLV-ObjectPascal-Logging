@@ -30,6 +30,20 @@ type
     procedure TestAsyncLog;
   end;
 
+  {
+   End-to-end V2 path: TLogBuilder + TLogHolder + GLV.Log.LogInfo.
+   The file logger format must stay the TPrimitiveFileLog contract.
+  }
+  TBuilderHolderFileTest = class(TCrossTestCase)
+  strict private
+    FFilepath: TFilepath;
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure TestHolderSyncFileFormat;
+  end;
+
 function StaticDateTime: TDatetime;
 
 implementation
@@ -38,6 +52,9 @@ uses
   SysUtils,
   DateUtils,
   Classes,
+  GLV.Log,
+  GLV.Log.Builder,
+  GLV.Log.Holder,
   GlvLog,
   TestEnv;
 
@@ -167,9 +184,49 @@ begin
   end;
 end;
 
+procedure TBuilderHolderFileTest.SetUp;
+begin
+  FFilepath := TEnv.TestFile;
+  TstDeleteFile(FFilepath);
+  TLogHolder.Inst := nil;
+end;
+
+procedure TBuilderHolderFileTest.TearDown;
+begin
+  { The holder owns the graph; only detach it, never free it here. }
+  TLogHolder.Inst := nil;
+  TstDeleteFile(FFilepath);
+  FFilepath := '';
+end;
+
+procedure TBuilderHolderFileTest.TestHolderSyncFileFormat;
+var
+  B: TLogBuilder;
+  Lines: TLines;
+begin
+  B := TLogBuilder.Create;
+  try
+    TLogHolder.Inst := B.SyncFile(FFilepath, @StaticDateTime).Build;
+  finally
+    FreeAndNil(B);
+  end;
+
+  GLV.Log.LogInfo('info text');
+
+  Lines := TstReadLines(FFilepath);
+  try
+    Assert.AreEqual(NativeInt(1), Length(Lines), 'unexpected readed lines count');
+    Assert.AreEqual('2026-08-09 12:30:00 [INFO] info text', Lines[0],
+      'V2 path (builder + holder) must keep the TPrimitiveFileLog format');
+  finally
+    SetLength(Lines, 0);
+  end;
+end;
+
 initialization
 
 CrossRegTest(TFileLogTest, 'Int');
 CrossRegTest(TAsyncFileLogTest, 'Int');
+CrossRegTest(TBuilderHolderFileTest, 'Int');
 
 end.

@@ -1,10 +1,9 @@
 # Дизайн: билдер лога и интеграция с V2
 
-Статус: решения приняты, реализация не начата.
+Статус: реализовано (2026-10-28); сборка и тесты пройдены, см. §16.
 Дата: 2026-10-28.
 Тулчейн найден `pascal-build-probe/scripts/probe.sh` (FPC 3.2.2 i386,
-FPC 3.3.1 x64, lazbuild 5.99, `GlvTestCross` -- ok); сборка и тесты ещё
-не запускались.
+FPC 3.3.1 x64, lazbuild 5.99, `GlvTestCross` -- ok).
 
 ## 1. Цель и рамки
 
@@ -381,7 +380,8 @@ double free.
 5. `GLV.Log.Builder`: `TLogBuilder` + тесты.
 6. `GLV.Log.Holder`: `TLogHolder` + hot-swap тесты.
 7. Доки: README, `doc/v2/usage.md`, `doc/v1/unit_uses_tree_ru.md`,
-   `doc/undocumented_units_checklist_ru.md`; при желании — демо на Builder+Holder.
+   `doc/undocumented_units_checklist_ru.md`; демо на Builder+Holder — `demos/builder`
+   (см. §16).
 
 ## 13. Сознательно не делаем
 
@@ -410,3 +410,37 @@ double free.
    но автоген-юнит пересобирает IDE/пакетный менеджер).
 2. Проверить синтаксис `deprecated` для класса в FPC и Delphi.
 3. Прогнать сборку/тесты через `pascal-build-probe` и зафиксировать результат.
+
+## 16. Реализация: отклонения от плана и результаты
+
+Отклонения (осознанные, с тестами):
+
+1. `TLogHolder.SetInst` дополнительно вынимает повторно устанавливаемый граф
+   из retired-списка. Без этого сценарий `Inst := A; Inst := B; Inst := A`
+   добавляет один объект в `FRetired` дважды и роняет процесс двойным free
+   при финализации (проверено: `exit=139` до фикса). Инвариант: `FInst` и
+   `FRetired` владеют непересекающимися наборами.
+2. `TLogBuilder.Build` сбрасывает `FLockRequested`/`FLock` вместе с sink'ами:
+   запрос лока принадлежит потреблённой конфигурации.
+3. `TLogBuilder.Add(nil)` бросает `ELogBuilderError` (иначе `Build` вернул бы
+   `nil` при одном sink'е).
+
+Пакеты: 4 новых юнита добавлены в `glv_log_def_engine.lpk` (автоген-юнит
+перегенерирован lazbuild) и в `glv_log_def_engine.ctpkg` (автоген-юнит
+Typhon остаётся `desync` до пересборки пакета в IDE — руками не правим).
+
+Проверка (2026-10-28):
+
+- `build.sh all` — `lib-v2`, `lib-v1-ct`, `tests`, `tests-int`, `demo`,
+  `demo-builder` — все `ok`;
+- `run-tests.sh Unit` — 23 теста, errors=0, failures=0, exit=0;
+- `run-tests.sh Int` — 4 теста, errors=0, failures=1 (`TestPrimitiveFileLogUnicode`,
+  известный дефект `GlvLogFileOps`/`UTF8Encode`, не связан с билдером);
+- Delphi не проверялся (в окружении отсутствует), CodeTyphon-пакет не собран
+  (нет Typhon);
+- i386 FPC 3.2.2: юниты и тест-проекты компилируются, smoke-прогон
+  Builder+Lock+Holder — `SMOKE OK`, heaptrc: 0 unfreed blocks;
+- `demos/builder`: `BuilderDemo.lpi` собран lazbuild и fpc-фолбэком,
+  smoke-прогон `BuilderDemo.exe` — `RESULT: PASS`, heaptrc: 0 unfreed blocks;
+  async-сценарий — только по `--async` (BL-001, BL-002), содержимое файла
+  не проверяется.

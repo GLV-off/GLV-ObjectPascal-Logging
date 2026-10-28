@@ -19,20 +19,34 @@ lib/src/            исходники библиотеки (единствен�
   GlvLogFiles.pas     TPrimitiveFileLog (sync), TAsyncFileLog + TAsyncLogThread
   GlvLogFileOps.pas   внутренние IO-утилиты (CreateStream/WriteLines/WriteBom) — не публичный API
   GlvLogDev.pas       DevLog* — прямой WriteLn, API нестабилен, в фасад не входит
-  GlvLog.pas          фасад: алиасы типов, TConsole, TLogging.Inst, Info/Warn/Error/Debug(+Fmt)
+  GlvLog.pas          фасад V1: алиасы типов, TLogging.Inst (deprecated), алиасы V2-типов
+  GLV.Log.Lvl.pas     V2-контракт: TLogLvl + AsStr/LogLvlAsStr
+  GLV.Log.Engine.pas  V2-контракт: TLogEngine — стабильный callback-прокси
+  GLV.Log.pas         V2: LogInfo/LogError/LogWarn/LogDebug поверх TLogEngine
+  GLV.Log.ConsoleSink.pas  TConsole.ConsoleLog — консольный sink (алиас в фасаде)
+  GLV.Log.Lock.pas    TLockLog — декоратор синхронизации, владеет inner-логгером
+  GLV.Log.Builder.pas TLogBuilder — fluent-сборка графа (вне контракта)
+  GLV.Log.Holder.pas  TLogHolder + HolderLog — хот-свап активного графа для V2
   backup/             старые версии юнитов, не в сборке — не трогать
-lib/pkg/lz/         Lazarus-пакеты: glv_log_def_engine.lpk (GlvLog* + GLV.Log.ConsoleEngine)
+lib/pkg/lz/         Lazarus-пакеты: glv_log_def_engine.lpk (GlvLog*, GLV.Log.*Engine,
+                    GLV.Log.ConsoleSink/Lock/Builder/Holder)
                     и glv_log_contract.lpk (GLV.Log, GLV.Log.Lvl, GLV.Log.Engine)
                     (+ автоген. одноимённые *.pas — DO NOT EDIT)
-lib/pkg/ct/         Code Typhon пакет glv_log_def_engine (ctpkg, ctinfo.txt, тот же автоген-юнит)
+lib/pkg/ct/         Code Typhon пакет glv_log_def_engine (ctpkg, ctinfo.txt, тот же автоген-юнит;
+                    V2-юниты подтягивают GLV.Log.Lvl/Engine из lib/src по search path)
 test/src/           тесты: LogTestUnit (unit), LogTestInt (integration), TestEnv, TestFileUtils
 test/pkg/lz/        Test.lpr (unit), TestInt.lpr (integration) + .lpi проекты
-demos/simple/       демо: src/DemoApp.pas, pkg/{lz,ct,delphi}
-doc/                unit_uses_tree_ru.md, undocumented_units_checklist_ru.md (RU)
-lib/out, test/out, demos/simple/out   артефакты сборки — в git не входят, руками не править
+demos/simple/       демо движка V2: src/DemoApp.pas, pkg/{lz,ct,delphi}
+demos/builder/      демо Builder+Holder: src/BuilderDemoApp.pas, pkg/lz
+doc/v1/             unit_uses_tree_ru.md, undocumented_units_checklist_ru.md (RU)
+doc/v2/             design_builder_ru.md (принятый дизайн), usage.md, req_engine.md (RU)
+lib/out, test/out, demos/simple/out, demos/builder/out   артефакты сборки — в git не входят, руками не править
 ```
 
-Граф зависимостей: `GlvLogTypes ← GlvLogBase ← {Custom, Group, Files}; Files → FileOps (только в implementation); GlvLog (фасад) → всё вышеперечисленное, кроме Dev и FileOps`. При изменении зависимостей обновлять `doc/unit_uses_tree_ru.md`.
+Граф зависимостей: `GLV.Log.Lvl ← GlvLogBase ← {Custom, Group, Files, ConsoleSink, Lock, Holder}`;
+`GLV.Log.Builder → {ConsoleSink, Lock, Custom, Group, Files}`; `GLV.Log.Holder → GLV.Log.Engine`;
+`Files → FileOps` (только в implementation); `GlvLog` (фасад) → `{Lvl, ConsoleSink, Lock, Builder}`
+и весь V1, кроме Dev и FileOps. При изменении зависимостей обновлять `doc/v1/unit_uses_tree_ru.md`.
 
 ## Сборка и тесты
 
@@ -42,7 +56,8 @@ FPC в PATH на текущей машине отсутствует (`which fpc`
 честно сообщить, что сборка не проверена, не выдумывать результат.
 
 - Библиотека: открыть `lib/pkg/lz/glv_log_def_engine.lpk` (v1) или `lib/pkg/lz/glv_log_contract.lpk` (v2) → Compile/Install, либо добавить `lib/src` в unit search path.
-- Демо: `demos/simple/pkg/lz/Demo.lpi` (Run), `.../ct/Demo.ctpr`, `.../delphi/Demo.dproj`.
+- Демо: `demos/simple/pkg/lz/Demo.lpi` (Run), `.../ct/Demo.ctpr`, `.../delphi/Demo.dproj`;
+  `demos/builder/pkg/lz/BuilderDemo.lpi` (Run).
 - Тесты: `test/pkg/lz/Test.lpi` и `TestInt.lpi`. Оба требуют установленный пакет
   **`GlvTestCross`** из соседнего репозитория `../pas_TestingWrapper`
   (`Pkg/LZ/glvtestcross.lpk`) и пакет `glv_log_def_engine` (TestInt.lpi) либо `glv_log_contract` (Test.lpi). Без них тесты не соберутся.
@@ -66,7 +81,10 @@ FPC в PATH на текущей машине отсутствует (`which fpc`
   (текст — `UnicodeString`, кодированием в байты занимается конкретный логгер).
   Комментарии к публичным членам — в стиле `{ ... }` перед объявлением (уже так везде).
 - Владедение: `TGroupLog` освобождает переданные ему логгеры; `TLogging.Inst` (сеттер)
-  освобождает предыдущий экземпляр; остальные логгеры освобождает вызывающий (`FreeAndNil`).
+  освобождает предыдущий экземпляр; `TLogBuilder` владеет sink'ами до `Build` (после —
+  граф/вызывающий), `TLockLog` владеет inner и созданным им локом, но не заимствованным;
+  `TLogHolder` владеет активным и вытесненными графами до финализации; остальные логгеры
+  освобождает вызывающий (`FreeAndNil`).
   Не смешивать с подсчётом ссылок интерфейсов — объекты не передаются как интерфейсы.
 - Один файл = один модуль; не добавлять `uses` в интерфейс без нужды (Facade намеренно
   тонкий). Файлы в CRLF, исходники в основном ASCII — сохранять переносы строк и кодировку.
@@ -79,7 +97,7 @@ FPC в PATH на текущей машине отсутствует (`which fpc`
 |---|---|
 | `TPrimitiveFileLog` | `yyyy-mm-dd hh:nn:ss [LEVEL] text` (время через инъектируемый `TDateTimeFunc`, по умолчанию `Now`) |
 | `TAsyncFileLog` | `[LEVEL]: text` |
-| `TConsole.ConsoleLog` | `LEVEL: t.id=<ThreadID>, m=text` |
+| `TConsole.ConsoleLog` | `LEVEL: t.id=<ThreadID>, m=text` (`GLV.Log.ConsoleSink`, алиас в фасаде) |
 | `TLogLvl.AsStr` | `INFO/DEBUG/ERROR/WARN`, иначе `UNKNOWN` |
 
 Файлы пишутся в UTF-8 (в `GlvLogFileOps` есть работа с BOM). Тесты сравнивают строки
@@ -104,13 +122,15 @@ FPC в PATH на текущей машине отсутствует (`which fpc`
   (`UTF8Encode` + `RawByteString` в `TPrimitiveFileLog` и `GlvLogFileOps.WriteLines`).
   Остаётся ловушка `Format`: в FPC он работает через `AnsiString`, поэтому
   `Format('%s', [UnicodeString])` теряет не-ASCII (`???`) на не-UTF-8 системной
-  кодировке; `Info/Warn/Error/Debug` минуют `Format` (прямой `Log`), а
-  `InfoFmt/WarnFmt/ErrorFmt/DebugFmt` (и любой `Format` внутри логгера) — Unicode-safe не гарантированы.
+  кодировке. V1-процедуры `Info/Warn/Error/Debug(+Fmt)` удалены вместе с этим
+  контрактом; в V2 `GLV.Log.LogInfo` идёт в `TLog.Log` напрямую, но любой `Format`
+  внутри логгера или callback'а Unicode-safe не гарантирован.
 - Фасад `GlvLog` экспортирует `TAsyncFileLogThread`, а README-пример использует
   `TAsyncLogThread` — пример требует `GlvLogFiles` в `uses`.
 - `GlvLogDev`/`GlvLogFileOps` — внутренние, в фасад не входят; `TestFileOps` помечен `@deprecated`.
 - `test/src/TestReport.pas` — пустая заготовка; `demos/simple/src/DemoApp.pas` и
   `pkg/delphi/Demo.dpr` ссылаются на отсутствующий `demo.inc` (незавершённая поддержка Delphi).
+  `demos/builder` не использует `demo.inc`; его сборка в Delphi не проверялась (`dcc` нет).
 - `LogTestInt.TestAsyncLog` полагается на `Sleep(500)` и файловую систему — флаки при нагрузке.
 
 ## Как добавлять изменения
@@ -119,7 +139,13 @@ FPC в PATH на текущей машине отсутствует (`which fpc`
 только `Log`; при необходимости — алиас в `GlvLog.pas` (иначе он недоступен пользователям
 фасада); добавить юнит в `.lpk`/`.ctpkg` через IDE; тест в `test/src` (`TCrossTestCase`,
 регистрация `CrossRegTest(TMyTest, 'Unit' | 'Int')` в `initialization`); обновить таблицы
-в `README.md` и `doc/unit_uses_tree_ru.md`, чек-лист в `doc/undocumented_units_checklist_ru.md`.
+в `README.md` и `doc/v1/unit_uses_tree_ru.md`, чек-лист в `doc/v1/undocumented_units_checklist_ru.md`.
+
+**V1 vs V2**: новый код — только `GLV.Log.*` (builder/holder); фасад `GlvLog` —
+legacy-слой, новые алиасы туда добавлять только по необходимости.
+Не смешивать `TLogging` и `TLogHolder`: оба ставят глобальный активный граф.
+`GLV.Log.ConsoleEngine`/`GLV.Log.SyncFileEngine` взаимоисключающи с holder'ом
+(они ставят callback в `initialization`).
 
 **Новый уровень лога**: `GlvLogTypes.TLogLvl` + `LogLvlAsStr` + при необходимости обёртка
 в `GlvLog.pas`; проверить `TLogLvlTest.TestAsStr`.
