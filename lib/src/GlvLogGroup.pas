@@ -14,7 +14,7 @@ interface
 
 uses
   Generics.Collections,
-  GlvLogTypes,
+  GLV.Log.Lvl,
   GlvLogBase;
 
 type

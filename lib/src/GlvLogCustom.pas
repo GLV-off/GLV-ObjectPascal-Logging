@@ -14,7 +14,7 @@ unit GlvLogCustom;
 interface
 
 uses
-  GlvLogTypes,
+  GLV.Log.Lvl,
   GlvLogBase;
 
 type

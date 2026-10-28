@@ -17,7 +17,7 @@ uses
   Classes,
   SyncObjs,
   Generics.Collections,
-  GlvLogTypes,
+  GLV.Log.Lvl,
   GlvLogBase;
 
 type

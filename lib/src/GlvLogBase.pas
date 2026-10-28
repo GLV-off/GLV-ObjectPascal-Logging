@@ -12,7 +12,7 @@ unit GlvLogBase;
 interface
 
 uses
-  GlvLogTypes;
+  GLV.Log.Lvl;
 
 type
   {
