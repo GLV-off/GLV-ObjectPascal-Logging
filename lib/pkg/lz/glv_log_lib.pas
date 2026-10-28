@@ -8,7 +8,8 @@ unit glv_log_lib;
 interface
 
 uses
-  GlvLog, GlvLogBase, GlvLogFileOps, GlvLogFiles, GlvLogGroup, GlvLogTypes;
+  GlvLog, GlvLogBase, GlvLogFileOps, GlvLogFiles, GlvLogGroup, GlvLogTypes, 
+  GlvLogContract, GlvLogEngine, GlvLogConsole;
 
 implementation
 

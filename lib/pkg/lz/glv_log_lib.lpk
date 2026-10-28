@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="5">
+  <Package Version="6">
     <PathDelim Value="\"/>
     <Name Value="glv_log_lib"/>
     <Type Value="RunTimeOnly"/>
@@ -53,6 +53,18 @@
       <Item>
         <Filename Value="..\..\src\GlvLogTypes.pas"/>
         <UnitName Value="GlvLogTypes"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogContract.pas"/>
+        <UnitName Value="GlvLogContract"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogEngine.pas"/>
+        <UnitName Value="GlvLogEngine"/>
+      </Item>
+      <Item>
+        <Filename Value="..\..\src\GlvLogConsole.pas"/>
+        <UnitName Value="GlvLogConsole"/>
       </Item>
     </Files>
     <RequiredPkgs>
