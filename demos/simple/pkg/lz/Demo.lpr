@@ -1,9 +1,11 @@
 program Demo;
 
+{$I 'demo.inc'}
+
 uses
   GLV.Log,
-  GLV.Log.SyncFileEngine;
-  //GLV.Log.ConsoleEngine;
+  // GLV.Log.SyncFileEngine;
+  GLV.Log.ConsoleEngine;
 
 begin
   LogInfo('log info');
