@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GlvLogDev
  Author:       GLV_off
  Description:  Developer level function's for logging.

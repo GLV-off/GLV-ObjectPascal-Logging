@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GLV.Log.Engine
  Author:       GLV_off
  Description:

@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GLV.Log.Holder
  Author:       GLV_off
  Description:  Runtime container of the active logging graph for the V2

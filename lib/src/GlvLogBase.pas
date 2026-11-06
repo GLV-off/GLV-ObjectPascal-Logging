@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GlvLogBase
  Author:       GLV_off
  Description:  Basic abstraction of logging object implementations.

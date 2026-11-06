@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GlvLogGroup
  Author:       GLV_off
  Description:  Implementation of TGroupLog utility object

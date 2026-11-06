@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GlvLogFileOps
  Author:       GLV_off
  Description:  Private IO utils for reading\writing data.

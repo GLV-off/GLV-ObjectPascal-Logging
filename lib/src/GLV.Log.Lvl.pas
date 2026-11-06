@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GLV.Log.Lvl
  Author:       GLV_off
  Description:  Basic types of logging library.

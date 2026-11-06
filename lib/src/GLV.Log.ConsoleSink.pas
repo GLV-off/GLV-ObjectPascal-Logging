@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GLV.Log.ConsoleSink
  Author:       GLV_off
  Description:  Console sink implementation for V2 logging graphs.

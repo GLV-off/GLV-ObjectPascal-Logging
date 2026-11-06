@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GLV.Log.Builder
  Author:       GLV_off
  Description:  Fluent builder that assembles a logging graph from

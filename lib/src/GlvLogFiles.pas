@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GlvLogFiles
  Author:       GLV_off
  Description:  Collection of file logger's. One sync and one

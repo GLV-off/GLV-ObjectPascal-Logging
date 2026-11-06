@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GlvLog
  Author:       GLV_off
  Description:  Library facade unit. Includes and redeclares

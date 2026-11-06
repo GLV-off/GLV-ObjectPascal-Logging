@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GlvLogCustom
  Author:       GLV_off
  Description:  Implementation of customizable logging object.

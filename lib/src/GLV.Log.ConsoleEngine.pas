@@ -1,4 +1,4 @@
-unit GLV.Log.ConsoleEngine;
+﻿unit GLV.Log.ConsoleEngine;
 
 {$I 'glv_log_lib.inc'}
 

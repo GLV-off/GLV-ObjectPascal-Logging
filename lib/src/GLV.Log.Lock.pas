@@ -1,4 +1,4 @@
-{
+﻿{
  Module:       GLV.Log.Lock
  Author:       GLV_off
  Description:  Thread-safety decorator for TLog based logging graphs.

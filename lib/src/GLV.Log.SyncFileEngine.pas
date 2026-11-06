@@ -1,4 +1,4 @@
-unit GLV.Log.SyncFileEngine;
+﻿unit GLV.Log.SyncFileEngine;
 
 {$I 'glv_log_lib.inc'}
 
