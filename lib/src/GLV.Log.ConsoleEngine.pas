@@ -12,7 +12,7 @@ uses
   GLV.Log.Lvl,
   GLV.Log.Engine;
 
-class procedure ConsoleLog(const ALvl: TLogLvl; const ATxt: UnicodeString);
+procedure ConsoleLog(const ALvl: TLogLvl; const ATxt: UnicodeString);
 begin
   WriteLn(ALvl.AsStr, ': t.id=', TThread.CurrentThread.ThreadID, ', m=', ATxt);
 end;

@@ -141,6 +141,7 @@ type
     procedure TestReassignRetiredGraphTwice;
     procedure TestNilInstRaises;
     procedure TestHotSwap;
+    procedure TestAnsiStringOverloadKeepsText;
   end;
 
 implementation
@@ -691,6 +692,23 @@ begin
   GLV.Log.LogInfo('back to the first graph');
   Assert.AreEqual(Int64(1), Int64(S1.Count), 're-installed graph did not receive the message');
   Assert.AreEqual(Int64(0), Int64(S2.Count), 'retired graph received the message');
+end;
+
+procedure TLogHolderTest.TestAnsiStringOverloadKeepsText;
+var
+  S: TLogSpy;
+  Txt: AnsiString;
+begin
+  S := TLogSpy.Create;
+  TLogHolder.Inst := S;
+  { AnsiString arguments go through the runtime conversion in
+    GLV.Log.LogInfo (FPC workaround for literals from UTF-8 BOM
+    sources): the whole text including the last char must survive. }
+  Txt := 'AB';
+  GLV.Log.LogInfo(Txt);
+  Assert.AreEqual(Int64(1), Int64(S.Count), 'message was not delivered');
+  Assert.AreEqual(UnicodeString('AB'), S.LastTxt,
+    'last char lost in the AnsiString overload');
 end;
 
 procedure TLogHolderTest.TestNilInstRaises;
