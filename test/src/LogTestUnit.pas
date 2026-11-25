@@ -245,14 +245,13 @@ end;
 
 procedure TDemosTest.TestDateUtils;
 var
-  D, D1: TDatetime;
-  M1, M2: Word;
+  D: TDatetime;
+  M1: Word;
+  M2: Word;
 begin
   D := EncodeDateTime(2026,01,01, 12, 10, 20, 00);
-  D1 := IncMinute(D, 1);
   M1 := MinuteOf(D);
-  M2 := MinuteOf(D1);
-  Assert.AreNotEqual(M1, M2, 'minutes should not be equal!');
+  M2 := MinuteOf(IncMinute(D, 1));
   Assert.AreEqual(10, M1, 'm1 - unexpected minute value');
   Assert.AreEqual(11, M2, 'm2 - unexpected minute value');
 end;
